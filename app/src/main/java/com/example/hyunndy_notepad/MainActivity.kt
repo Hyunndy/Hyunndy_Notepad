@@ -39,9 +39,9 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView = findViewById(R.id.recyclerView)
 
         //리사이클러뷰에 어댑터 객체 지정과 초기화.
-        mRecyclerAdapter = RecyclerAdapter(this, mList)
+        mRecyclerAdapter = RecyclerAdapter(mList)
         {
-            openDetailMemo()
+            openDetailMemo(it)
         }
 
         //어댑터 지정
@@ -53,25 +53,30 @@ class MainActivity : AppCompatActivity() {
         addItem(R.drawable.jellybean, "젤리빈", "안녕하세요제이름은유현지입니다저는지금이어플을개발하고있는데제발자동줄바꿈좀되었으면좋겠네요너무화가나니까요.")
 
         //}} 20200220 hyeonjiy
-
-
-        //{{ 20200220 hyeonjiy : 2. 리스트뷰 클릭 시 상세 메모로 넘어감.
-
-        // 리사이클러뷰는 아이템 뷰에서 OnClickListner를 통해 처리하게 만들어놓았다.
-        // 어댑터를 통해 만들어진 각 아이템 뷰는 "뷰 홀더"객체에 저장되어 화면에 표시되고, 필요에 따라 생성 또는 재활용 된다.
-        // 아이템뷰는 "뷰 홀더"가 갖고있기 때문에 뷰 홀더 객체에서 클릭 이벤트를 처리한다.
-
-
-        //}} 20200220 hyeonjiy
-
     }
 
-    private fun openDetailMemo()
+    //{{ 20200220 hyeonjiy : 2. 리스트뷰 클릭 시 상세 메모로 넘어감.
+
+    // 리사이클러뷰는 아이템 뷰에서 OnClickListner를 통해 처리하게 만들어놓았다.
+    // 어댑터를 통해 만들어진 각 아이템 뷰는 "뷰 홀더"객체에 저장되어 화면에 표시되고, 필요에 따라 생성 또는 재활용 된다.
+    // 아이템뷰는 "뷰 홀더"가 갖고있기 때문에 뷰 홀더 객체에서 클릭 이벤트를 처리한다.
+    // 여기다가 데이터도 넘겨줘야한다.
+    private fun openDetailMemo(simpleMemo : RecyclerItem)
     {
-        var intent = Intent(this, DetailMemoActvity::class.java)
+        //{{ 20200221 hyeonjiy: 객체 전달 하기
+        // 줄 메모
+        var detail_memo = DetailMemoClass()
+        detail_memo.imagesrc = simpleMemo.getIcon()
+        detail_memo.title = simpleMemo.getTitle()
+        detail_memo.desc = simpleMemo.getDesc()
 
-        startActivity(intent)
+        var intent = Intent(this, DetailMemoActvity::class.java)
+        intent.putExtra("DetailMemo", detail_memo)
+        startActivityForResult(intent, 0) // 객체 수정하면 다시 메모 업데이트되어야하니까?
+        //} 20200221 hyeonjiy:
     }
+
+    //}} 20200220 hyeonjiy
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.

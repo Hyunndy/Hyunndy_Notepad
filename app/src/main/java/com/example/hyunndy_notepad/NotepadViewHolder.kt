@@ -22,7 +22,7 @@ import com.example.hyunndy_notepad.MemoItem as RecyclerItem
  //1. 어댑터 구현.
  //2. 리사이클러뷰에서는 반드시 개발자가 어댑터를 직접 구현해야 한다.
 // Unit은 아무것도 반환하지 않는다는것이다.
-public class NotepadAdapter(val context: Context, val memoList:ArrayList<RecyclerItem>, val itemClick : (RecyclerItem) -> Unit) : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()
+public class NotepadAdapter(val memoList:ArrayList<RecyclerItem>, val itemClick : (RecyclerItem) -> Unit) : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()
 {
 
     // 뷰홀더
@@ -31,7 +31,7 @@ public class NotepadAdapter(val context: Context, val memoList:ArrayList<Recycle
         val title = memoItem?.findViewById<TextView>(R.id.textView)
         val desc = memoItem?.findViewById<TextView>(R.id.textView3)
 
-        fun bind (Items : RecyclerItem, context: Context)
+        fun bind (Items : RecyclerItem)
         {
             if(Items.getIcon() != -1)
             {
@@ -47,7 +47,7 @@ public class NotepadAdapter(val context: Context, val memoList:ArrayList<Recycle
 
             // 메모하나가 클릭됐을 때 처리할 일을 itemClick으로 설정한다.
             // (RecyclerItem) -> Unit에 대한 함수는 나중에 mainactivity.kt에서 작성한다.
-            memoItem.setOnClickListener{ itemClick(Items)}
+            memoItem.setOnClickListener{ itemClick(Items) }
         }
     }
 
@@ -73,7 +73,7 @@ public class NotepadAdapter(val context: Context, val memoList:ArrayList<Recycle
     // 데이터를 뷰홀더에 바인딩.
     override fun onBindViewHolder(holder: NotePadViewHolder, position: Int) {
 
-        holder.bind(memoList[position], context)
+        holder.bind(memoList[position])
     }
 
 
