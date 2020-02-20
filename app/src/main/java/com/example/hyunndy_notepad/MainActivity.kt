@@ -1,5 +1,6 @@
 package com.example.hyunndy_notepad
 
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -25,16 +26,23 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+
+            //액티비티 실행
+            var intent = Intent(this, NewMemoActivity::class.java)
+            startActivity(intent)
         }
 
+        //{{ 20200220 hyeonjiy : 1. 기본 View 세팅
         // 리사이클러뷰 가져오기
         mRecyclerView = findViewById(R.id.recyclerView)
 
         //리사이클러뷰에 어댑터 객체 지정과 초기화.
-        mRecyclerAdapter = RecyclerAdapter(mList)
+        mRecyclerAdapter = RecyclerAdapter(this, mList)
+        {
+            openDetailMemo()
+        }
 
         //어댑터 지정
         mRecyclerView?.adapter = mRecyclerAdapter
@@ -42,9 +50,27 @@ class MainActivity : AppCompatActivity() {
         // 세로 방향 배치를 위해  LinearLayoutManager을 사용한다.
         mRecyclerView?.layoutManager = LinearLayoutManager(this)
 
-        addItem(R.drawable.jellybean, "젤리빈", "이것은 젤리빈입니다.")
+        addItem(R.drawable.jellybean, "젤리빈", "안녕하세요제이름은유현지입니다저는지금이어플을개발하고있는데제발자동줄바꿈좀되었으면좋겠네요너무화가나니까요.")
+
+        //}} 20200220 hyeonjiy
 
 
+        //{{ 20200220 hyeonjiy : 2. 리스트뷰 클릭 시 상세 메모로 넘어감.
+
+        // 리사이클러뷰는 아이템 뷰에서 OnClickListner를 통해 처리하게 만들어놓았다.
+        // 어댑터를 통해 만들어진 각 아이템 뷰는 "뷰 홀더"객체에 저장되어 화면에 표시되고, 필요에 따라 생성 또는 재활용 된다.
+        // 아이템뷰는 "뷰 홀더"가 갖고있기 때문에 뷰 홀더 객체에서 클릭 이벤트를 처리한다.
+
+
+        //}} 20200220 hyeonjiy
+
+    }
+
+    private fun openDetailMemo()
+    {
+        var intent = Intent(this, DetailMemoActvity::class.java)
+
+        startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
