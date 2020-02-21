@@ -1,19 +1,22 @@
 package com.example.hyunndy_notepad
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 import kotlinx.android.synthetic.main.activity_detail_memo_actvity.*
 import kotlinx.android.synthetic.main.content_detail_memo_actvity.*
+import java.io.ByteArrayOutputStream
 
 class DetailMemoActvity : AppCompatActivity() {
+
+    var isRunning = false
+    var modifiedmemo:DetailMemoClass? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,15 +26,10 @@ class DetailMemoActvity : AppCompatActivity() {
         // 메모 보여줌
         showMemo()
 
-        // 수정 완료 리스너
-        // 1. 제목
-        detail_edittitle.setOnEditorActionListener { v, actionId, event ->
-            completeTitle()
-        }
 
-        detail_editdesc.setOnEditorActionListener { v, actionId, event ->
-            completeDesc()
-        }
+       //detail_editdesc.setOnEditorActionListener { v, actionId, event ->
+       //    completeDesc()
+       //}
 
     }
 
@@ -46,7 +44,12 @@ class DetailMemoActvity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.edit_memo ->
             {
+                modifiedmemo = DetailMemoClass()
                 editMemo()
+            }
+            R.id.complete_memo ->
+            {
+                completeModification()
             }
             else ->
             {
@@ -68,6 +71,8 @@ class DetailMemoActvity : AppCompatActivity() {
         //}}
     }
 
+    // 사진 편집
+
     // 메모 편집( TEXTVIEW -> EDITTEXT )
     private fun editMemo() : Boolean
     {
@@ -82,34 +87,83 @@ class DetailMemoActvity : AppCompatActivity() {
         return true
     }
 
+    private fun completeModification() : Boolean
+    {
+        completeImage()
+        completeTitle()
+        completeDesc()
+
+        return true
+    }
+
+    // 이미지 수정 완료
+    private fun completeImage()
+    {
+        isRunning = true
+
+        var compressThread = ThreadClass()
+        compressThread.start()
+    }
+
     // 메모 편집 완료( EDITTEXT -> TEXTVIEW )
-    private fun completeTitle() : Boolean
+    private fun completeTitle()
     {
         detail_title.visibility = View.VISIBLE
         detail_edittitle.visibility = View.GONE
 
         detail_title.text = detail_edittitle.text
 
-        return true
+        modifiedmemo?.title = detail_title.text.toString()
     }
 
     // 메모 편집 완료
-    private  fun completeDesc() : Boolean
+    private  fun completeDesc()
     {
         detail_desc.visibility = View.VISIBLE
         detail_editdesc.visibility = View.GONE
 
         detail_desc.text = detail_editdesc.text
 
-        return true
+        modifiedmemo?.desc = detail_desc.toString()
+    }
+
+    inner class ThreadClass:Thread()
+    {
+        override fun run() {
+            while(isRunning)
+            {
+                runOnUiThread{
+                    //이미지
+                    val bitmap = detail_image.drawable as Bitmap
+                    val stream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+
+                    modifiedmemo?.imagesrc = stream.toByteArray()
+
+                    isRunning = false
+                }
+            }
+        }
     }
 
     // 뒤로가기 해서 액티비티 전환 시 Main에 Intent전달.
     override fun onBackPressed() {
 
+        if(modifiedmemo != null)
+        {
+            var intent = Intent()
+            intent.putExtra("modifiedMemo", intent)
 
+            setResult(0, intent)
+            finish()
+        }
 
         super.onBackPressed()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        isRunning = false
+    }
 }

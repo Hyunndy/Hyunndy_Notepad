@@ -11,4 +11,13 @@
         android:title="edit"
         android:visible="true"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/complete_memo"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher_round"
+        android:orderInCategory="200"
+        android:title="edit"
+        android:visible="true"
+        app:showAsAction="always" />
 </menu>
