@@ -1,19 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.hyunndy_notepad.MainActivity">
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+    tools:context="com.example.hyunndy_notepad.DetailMemoActvity">
 
     <item
         android:id="@+id/edit_memo"
         android:enabled="true"
-        android:icon="@drawable/plus_icon2"
+        android:icon="@drawable/search_icon"
         android:orderInCategory="100"
-        android:title="Add"
+        android:title="edit"
         android:visible="true"
         app:showAsAction="always" />
 </menu>

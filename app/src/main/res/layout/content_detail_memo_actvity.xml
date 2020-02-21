@@ -9,7 +9,7 @@
     tools:showIn="@layout/activity_detail_memo_actvity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/detail_image"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginStart="50dp"
@@ -20,22 +20,46 @@
         app:srcCompat="@drawable/jellybean" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/detail_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
         android:text="TextView"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/detail_image" />
+
+    <EditText
+        android:id="@+id/detail_edittitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="EditView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detail_image" />
+
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/detail_desc"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="내용"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView2" />
+        app:layout_constraintTop_toBottomOf="@id/detail_title" />
+
+    <EditText
+        android:id="@+id/detail_editdesc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="내용"
+        android:visibility="gone"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detail_edittitle" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

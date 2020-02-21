@@ -29,4 +29,10 @@
         </activity>
     </application>
 
+    // 갤러리에서 꺼내와야 하므로 외부저장소 권한이 필요하다.
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+
+
 </manifest>

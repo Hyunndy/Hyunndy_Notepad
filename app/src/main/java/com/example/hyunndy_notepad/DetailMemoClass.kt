@@ -6,7 +6,7 @@ import android.os.Parcelable
 // Parcelable 인터페이스 구현
 class DetailMemoClass : Parcelable{
 
-    var imagesrc:Int? = 0
+    var imagesrc:ByteArray? = null
     var title:String? = null
     var desc:String? = null
 
@@ -21,7 +21,7 @@ class DetailMemoClass : Parcelable{
 
                 val memo = DetailMemoClass()
 
-                memo.imagesrc = source?.readInt()!!
+                memo.imagesrc = source?.createByteArray()
                 memo.title = source?.readString()
                 memo.desc = source?.readString()
 
@@ -40,7 +40,7 @@ class DetailMemoClass : Parcelable{
 
         //데이터를 넣자.
         //이거 0 값이 들어가면 우짜노?
-        dest?.writeInt(imagesrc!!)
+        dest?.writeByteArray(imagesrc)
         dest?.writeString(title)
         dest?.writeString(desc)
     }
