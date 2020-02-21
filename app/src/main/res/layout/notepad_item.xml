@@ -14,6 +14,7 @@
         android:layout_marginTop="5dp"
         android:text="Title"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,9 +23,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_weight="10"
+        android:layout_marginTop="12dp"
         android:ellipsize="end"
         android:maxLines="3"
         android:scrollHorizontally="false"
@@ -35,8 +34,8 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="150dp"
-        android:layout_height="100dp"
+        android:layout_width="255dp"
+        android:layout_height="217dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="3dp"

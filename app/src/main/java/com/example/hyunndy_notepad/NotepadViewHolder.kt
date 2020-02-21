@@ -4,8 +4,10 @@ import android.content.ClipData
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
+import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.notepad_item.view.*
 import org.w3c.dom.Text
 import com.example.hyunndy_notepad.MemoItem as RecyclerItem
@@ -23,8 +26,25 @@ import com.example.hyunndy_notepad.MemoItem as RecyclerItem
  //1. 어댑터 구현.
  //2. 리사이클러뷰에서는 반드시 개발자가 어댑터를 직접 구현해야 한다.
 // Unit은 아무것도 반환하지 않는다는것이다.
-public class NotepadAdapter(val memoList:ArrayList<RecyclerItem>, val itemClick : (RecyclerItem) -> Unit) : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()
+public class NotepadAdapter(val itemClick : (RecyclerItem) -> Unit) : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()
 {
+    private var updateMemolist = arrayListOf<RecyclerItem>()
+
+    public fun setMemolist(set:ArrayList<RecyclerItem>)
+    {
+        if(this.updateMemolist != null)
+        {
+            this.updateMemolist.clear()
+            this.updateMemolist.addAll(set)
+        }
+        else
+        {
+            this.updateMemolist.clear()
+            this.updateMemolist = set
+        }
+
+        notifyDataSetChanged()
+    }
 
     // 뷰홀더
      inner class NotePadViewHolder(val memoItem : View, itemClick: (RecyclerItem) -> Unit) : RecyclerView.ViewHolder(memoItem) {
@@ -32,12 +52,14 @@ public class NotepadAdapter(val memoList:ArrayList<RecyclerItem>, val itemClick 
         val title = memoItem?.findViewById<TextView>(R.id.textView)
         val desc = memoItem?.findViewById<TextView>(R.id.textView3)
 
+
         fun bind (Items : RecyclerItem)
         {
             if(Items.getIcon() != null)
             {
                 var array = Items.getIcon()
                 var Bitmap = BitmapFactory.decodeByteArray(array, 0, array?.size!!)
+                Bitmap = resizeBitmap(480, Bitmap) // 이미지 조절 추가
                 image.setImageBitmap(Bitmap)
             }
             else
@@ -76,13 +98,26 @@ public class NotepadAdapter(val memoList:ArrayList<RecyclerItem>, val itemClick 
     // 데이터를 뷰홀더에 바인딩.
     override fun onBindViewHolder(holder: NotePadViewHolder, position: Int) {
 
-        holder.bind(memoList[position])
+        Log.d("test1", "onBindViewHolder가 언제 불릴까?")
+        holder.bind(updateMemolist[position])
     }
 
 
     // 전체 아이템 갯수 리턴
     override fun getItemCount(): Int {
-        return memoList.size
+        return updateMemolist.size
     }
 
+    // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
+    private fun resizeBitmap(targetWidth : Int, source: Bitmap) : Bitmap
+    {
+        var ratio = source.height.toDouble() / source.width.toDouble()
+        var targetHeight = (targetWidth * ratio).toInt()
+        var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
+        if(result != source)
+        {
+            source.recycle()
+        }
+        return result
+    }
 }

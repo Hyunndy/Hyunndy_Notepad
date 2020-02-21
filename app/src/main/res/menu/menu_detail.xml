@@ -4,7 +4,7 @@
     tools:context="com.example.hyunndy_notepad.DetailMemoActvity">
 
     <item
-        android:id="@+id/edit_memo"
+        android:id="@+id/add_memo"
         android:enabled="true"
         android:icon="@drawable/search_icon"
         android:orderInCategory="100"

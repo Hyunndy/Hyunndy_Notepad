@@ -14,11 +14,13 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 
 import kotlinx.android.synthetic.main.activity_new_memo.*
 import kotlinx.android.synthetic.main.content_new_memo.*
+import org.w3c.dom.Text
 import java.io.ByteArrayOutputStream
 
 // 뉴 메모.
@@ -36,38 +38,37 @@ class NewMemoActivity : AppCompatActivity() {
         var newDesc:EditText = findViewById(R.id.newdesc)
 
 
-        // 버튼 누르면 Title에있는거, 설명에 있는거 묶어서 DB에 저장해야됨.
-        // MainActivity로 돌아가면 DB 다시 로드? 있는건 있는대로 하면좋겠는데 다시 로드하지말고..
         fab.setOnClickListener { view ->
             Snackbar.make(view, "저장버튼", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
 
-            if(newImageByteCode?.isNotEmpty()!!)
+            if(newImageByteCode != null)
             {
-                // 일단 해놓고 나중에 전달해보자 ㅎㅎㅎ
-                //DB에 저장.
-                var values = ContentValues().apply {
-                    put("image",newImageByteCode)
-                    put("title", newTitle.text.toString())
-                    put("description", newDesc.text.toString())
-                }
+                var newMemo = DetailMemoClass()
+                newMemo.imagesrc = newImageByteCode
+                newMemo.title = newTitle.text.toString()
+                newMemo.desc = newTitle.text.toString()
 
-                var memodb:SQLiteDatabase = openOrCreateDatabase("Notepad.db", Context.MODE_PRIVATE, null)
-                var newRowId = memodb?.insert("memolist", null, values)
+                // 전달하기. 타이틀만 던져서 타이틀에서 찾도록하자.
+                var intent = Intent()
+                intent.putExtra("newMemo", newMemo)
+                setResult(Activity.MODE_APPEND, intent)
             }
         }
 
+        // 앨범 추가칸.
         button.setOnClickListener { view ->
             var intent = Intent(Intent.ACTION_PICK)
             intent.type = android.provider.MediaStore.Images.Media.CONTENT_TYPE
-            startActivityForResult(intent, 1)
+            startActivityForResult(intent, 0)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(resultCode == Activity.RESULT_OK)
+        // 앨범선택칸에서 다시 돌아왔을 때.
+        if(requestCode == 0)
         {
             var c = contentResolver.query(data?.data!!, null, null, null, null)
             c?.moveToNext()
@@ -76,13 +77,47 @@ class NewMemoActivity : AppCompatActivity() {
             var source = c?.getString(index!!)
 
             var bitmap = BitmapFactory.decodeFile(source)
+            bitmap = resizeBitmap(480, bitmap)
 
             newImage.setImageBitmap(bitmap)
 
             val stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
             newImageByteCode = stream.toByteArray()
+
+
         }
     }
 
+    // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
+    private fun resizeBitmap(targetWidth : Int, source: Bitmap) : Bitmap
+    {
+        var ratio = source.height.toDouble() / source.width.toDouble()
+        var targetHeight = (targetWidth * ratio).toInt()
+        var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
+        if(result != source)
+        {
+            source.recycle()
+        }
+        return result
+    }
+
 }
+
+/*
+SQLiteDatabase mclassDB1 = this.openOrCreateDatabase("myassign1", MODE_PRIVATE, null);
+Cursor cursor = mclassDB1.rawQuery("SELECT * FROM myassign1", null);
+
+ArrayList<String> msubject1List = new ArrayList<>();
+ArrayList<String> mday1List     = new ArrayList<>();
+
+if (cursor != null) {
+    if (cursor.moveToFirst()) {
+        do {
+            msubject1List.add(cursor.getString(cursor.getColumnIndex("msubject1")));
+            mday1List.add(cursor.getString(cursor.getColumnIndex("mday1List")));
+        } while (cursor.moveToNext());
+    }
+    cursor.close();
+}
+ */

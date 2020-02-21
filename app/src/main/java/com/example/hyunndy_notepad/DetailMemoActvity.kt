@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -25,13 +26,10 @@ class DetailMemoActvity : AppCompatActivity() {
         setContentView(R.layout.activity_detail_memo_actvity)
         setSupportActionBar(toolbar)
 
+        Log.d("test1", "여기 들어오긴하나?")
+
         // 메모 보여줌
         showMemo()
-
-       //detail_editdesc.setOnEditorActionListener { v, actionId, event ->
-       //    completeDesc()
-       //}
-
     }
 
     // 상세 내용 편집/삭제/저장
@@ -43,7 +41,7 @@ class DetailMemoActvity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.edit_memo ->
+            R.id.add_memo ->
             {
                 isModified = true
                 editMemo()
@@ -64,10 +62,10 @@ class DetailMemoActvity : AppCompatActivity() {
         //{{ 4. 20200221 hyeonjiy : 전달받은 텍스트 내용 출력하기
         var detail_memo = intent.getParcelableExtra<DetailMemoClass>("DetailMemo")
 
-        var image = BitmapFactory.decodeByteArray(detail_memo.imagesrc, 0, detail_memo.imagesrc?.size!!)
+        var bitmap = BitmapFactory.decodeByteArray(detail_memo.imagesrc, 0, detail_memo.imagesrc?.size!!)
+        bitmap = resizeBitmap(480, bitmap)
 
-
-        detail_image.setImageBitmap(image)
+        detail_image.setImageBitmap(bitmap)
         detail_title.text = detail_memo.title
         detail_desc.text = detail_memo.desc
         //}}
@@ -94,7 +92,6 @@ class DetailMemoActvity : AppCompatActivity() {
 
     private fun completeModification() : Boolean
     {
-
         completeImage()
         completeTitle()
         completeDesc()
@@ -111,9 +108,6 @@ class DetailMemoActvity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
         modifiedmemo?.imagesrc = stream.toByteArray()
-
-       // var compressThread = ThreadClass()
-       // compressThread.start()
     }
 
     // 메모 편집 완료( EDITTEXT -> TEXTVIEW )
@@ -160,5 +154,18 @@ class DetailMemoActvity : AppCompatActivity() {
         super.onDestroy()
 
         isModified = false
+    }
+
+    // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
+    private fun resizeBitmap(targetWidth : Int, source: Bitmap) : Bitmap
+    {
+        var ratio = source.height.toDouble() / source.width.toDouble()
+        var targetHeight = (targetWidth * ratio).toInt()
+        var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
+        if(result != source)
+        {
+            source.recycle()
+        }
+        return result
     }
 }

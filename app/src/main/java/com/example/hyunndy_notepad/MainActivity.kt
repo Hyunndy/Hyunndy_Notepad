@@ -16,6 +16,7 @@ import android.view.MenuItem
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.w3c.dom.Text
 import com.example.hyunndy_notepad.MemoItem as RecyclerItem
 import com.example.hyunndy_notepad.NotepadAdapter as RecyclerAdapter
 
@@ -55,22 +56,27 @@ class MainActivity : AppCompatActivity() {
         // 리사이클러뷰 가져오기
         mRecyclerView = findViewById(R.id.recyclerView)
 
+        // 세로 방향 배치를 위해  LinearLayoutManager을 사용한다.
+        mRecyclerView?.layoutManager = LinearLayoutManager(this)
+
+
         //리사이클러뷰에 어댑터 객체 지정과 초기화.
-        mRecyclerAdapter = RecyclerAdapter(mList)
+        mRecyclerAdapter = RecyclerAdapter()
         {
             openDetailMemo(it)
         }
 
+        readDB()
+
+        mRecyclerAdapter?.setMemolist(mList)
+
+
         //어댑터 지정
         mRecyclerView?.adapter = mRecyclerAdapter
-
-        // 세로 방향 배치를 위해  LinearLayoutManager을 사용한다.
-        mRecyclerView?.layoutManager = LinearLayoutManager(this)
-
         //}}
 
         // DB읽고 출력
-        readDB()
+
         //}} 20200220 hyeonjiy
 
         // @HACK
@@ -110,7 +116,13 @@ class MainActivity : AppCompatActivity() {
 
         var intent = Intent(this, DetailMemoActvity::class.java)
         intent.putExtra("DetailMemo", detail_memo)
+
+        Log.d("test1", "여기서뻑남")
+
+
         startActivityForResult(intent, DETAILMEMO) // 객체 수정하면 다시 메모 업데이트되어야하니까?
+
+        Log.d("test1", "여기서뻑남2")
         //} 20200221 hyeonjiy
     }
     //}} 20200220 hyeonjiy
@@ -124,6 +136,37 @@ class MainActivity : AppCompatActivity() {
             // UPDATE로 메모 업데이트
             Log.d("test1", "여기들어오긴하니...?")
             updateDB(data)
+        }
+        else if(resultCode == Activity.MODE_APPEND)
+        {
+            var memo = data?.getParcelableExtra<DetailMemoClass>("newMemo")
+
+            var contentValues = ContentValues()
+            contentValues.put("image", memo?.imagesrc)
+            contentValues.put("title", memo?.title)
+            contentValues.put("description", memo?.desc)
+
+            memodb?.insert("memolist", null, contentValues)
+
+            var c: Cursor? = memodb?.rawQuery("select * from memolist where title = ?", arrayOf(memo?.title))
+
+            while (c?.moveToNext()!!) {
+                var idx_pos = c.getColumnIndex("idx")
+                var img_pos = c.getColumnIndex("image")
+                var title_pos = c.getColumnIndex("title")
+                var desc_pos = c.getColumnIndex("description")
+
+                var idx = c.getInt(idx_pos)
+                var imgData = c.getBlob(img_pos)
+                var titleData = c.getString(title_pos)
+                var descData = c.getString(desc_pos)
+
+                Log.d("test2", c?.getColumnName(idx_pos))
+                Log.d("test2", c?.getColumnName(img_pos))
+                Log.d("test2", c?.getColumnName(title_pos))
+                Log.d("test2", c?.getColumnName(desc_pos))
+                addItem(idx, imgData, titleData, descData)
+            }
         }
     }
 
@@ -142,7 +185,7 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> {
                 return true
             }
-            R.id.edit_memo -> {
+            R.id.add_memo -> {
                 var intent = Intent(this, NewMemoActivity::class.java)
                 startActivityForResult(intent, NEWMEMO)
                 return true
@@ -154,6 +197,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     public fun addItem(memoIdx:Int, iconPath: ByteArray, title: String, desc: String) {
+
         var item = RecyclerItem()
 
         item.setIdx(memoIdx)
@@ -162,6 +206,7 @@ class MainActivity : AppCompatActivity() {
         item.setDesc(desc)
 
         mList.add(item)
+        mRecyclerAdapter?.setMemolist(mList)
     }
 
     override fun onDestroy() {
@@ -192,6 +237,7 @@ class MainActivity : AppCompatActivity() {
             // 리스트 출력!
             addItem(idx, imgData, titleData, descData)
         }
+
         //}} 20200221
     }
 
@@ -199,8 +245,6 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         Log.d("test1", "리스타트@@@@@@@@@@@@@@@@@@@@@@@@@")
-
-        //readDB()
     }
 
 

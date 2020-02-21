@@ -9,11 +9,11 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/edit_memo"
+        android:id="@+id/add_memo"
         android:enabled="true"
         android:icon="@drawable/plus_icon2"
         android:orderInCategory="100"
-        android:title="Add"
+        android:title="add_memo"
         android:visible="true"
         app:showAsAction="always" />
 </menu>

@@ -10,10 +10,11 @@
 
     <ImageView
         android:id="@+id/detail_image"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="255dp"
+        android:layout_height="217dp"
         android:layout_marginStart="50dp"
         android:layout_marginEnd="50dp"
+        android:adjustViewBounds="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
