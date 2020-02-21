@@ -8,10 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper
 
 // DB구조 이미지주소
 
-class NotepadDBHelper(context : Context) : SQLiteOpenHelper(context, "Notepad.db", null, 2)
+class NotepadDBHelper(context : Context) : SQLiteOpenHelper(context, "Notepad.db", null, 1)
 {
     override fun onCreate(db: SQLiteDatabase?) {
         val query = "create table memolist(" +
+                "idx integer primary key autoincrement," +
                 "image BLOB," +
                 "title text," +
                 "description text" +

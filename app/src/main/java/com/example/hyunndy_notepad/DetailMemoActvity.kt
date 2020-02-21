@@ -1,8 +1,10 @@
 package com.example.hyunndy_notepad
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -15,7 +17,7 @@ import java.io.ByteArrayOutputStream
 
 class DetailMemoActvity : AppCompatActivity() {
 
-    var isRunning = false
+    var isModified = false
     var modifiedmemo:DetailMemoClass? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +27,6 @@ class DetailMemoActvity : AppCompatActivity() {
 
         // 메모 보여줌
         showMemo()
-
 
        //detail_editdesc.setOnEditorActionListener { v, actionId, event ->
        //    completeDesc()
@@ -44,7 +45,7 @@ class DetailMemoActvity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.edit_memo ->
             {
-                modifiedmemo = DetailMemoClass()
+                isModified = true
                 editMemo()
             }
             R.id.complete_memo ->
@@ -65,10 +66,14 @@ class DetailMemoActvity : AppCompatActivity() {
 
         var image = BitmapFactory.decodeByteArray(detail_memo.imagesrc, 0, detail_memo.imagesrc?.size!!)
 
+
         detail_image.setImageBitmap(image)
         detail_title.text = detail_memo.title
         detail_desc.text = detail_memo.desc
         //}}
+
+        modifiedmemo = DetailMemoClass()
+        modifiedmemo?.idx = detail_memo.idx
     }
 
     // 사진 편집
@@ -89,6 +94,7 @@ class DetailMemoActvity : AppCompatActivity() {
 
     private fun completeModification() : Boolean
     {
+
         completeImage()
         completeTitle()
         completeDesc()
@@ -99,10 +105,15 @@ class DetailMemoActvity : AppCompatActivity() {
     // 이미지 수정 완료
     private fun completeImage()
     {
-        isRunning = true
+        val tempImage = detail_image.drawable as BitmapDrawable
+        val bitmap = tempImage.bitmap
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
-        var compressThread = ThreadClass()
-        compressThread.start()
+        modifiedmemo?.imagesrc = stream.toByteArray()
+
+       // var compressThread = ThreadClass()
+       // compressThread.start()
     }
 
     // 메모 편집 완료( EDITTEXT -> TEXTVIEW )
@@ -124,46 +135,30 @@ class DetailMemoActvity : AppCompatActivity() {
 
         detail_desc.text = detail_editdesc.text
 
-        modifiedmemo?.desc = detail_desc.toString()
+        modifiedmemo?.desc = detail_desc.text.toString()
     }
 
-    inner class ThreadClass:Thread()
-    {
-        override fun run() {
-            while(isRunning)
-            {
-                runOnUiThread{
-                    //이미지
-                    val bitmap = detail_image.drawable as Bitmap
-                    val stream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
-
-                    modifiedmemo?.imagesrc = stream.toByteArray()
-
-                    isRunning = false
-                }
-            }
-        }
-    }
 
     // 뒤로가기 해서 액티비티 전환 시 Main에 Intent전달.
     override fun onBackPressed() {
 
-        if(modifiedmemo != null)
+        if(isModified)
         {
             var intent = Intent()
-            intent.putExtra("modifiedMemo", intent)
+            intent.putExtra("modifiedMemo", modifiedmemo)
 
-            setResult(0, intent)
+            setResult(Activity.RESULT_OK, intent)
             finish()
         }
-
-        super.onBackPressed()
+        else
+        {
+            super.onBackPressed()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        isRunning = false
+        isModified = false
     }
 }

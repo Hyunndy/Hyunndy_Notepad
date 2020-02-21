@@ -1,5 +1,7 @@
 package com.example.hyunndy_notepad
 
+import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
@@ -100,6 +102,8 @@ class MainActivity : AppCompatActivity() {
         //{{ 20200221 hyeonjiy: 객체 전달 하기
         // 줄 메모
         var detail_memo = DetailMemoClass()
+
+        detail_memo.idx = simpleMemo.getIdx()
         detail_memo.imagesrc = simpleMemo.getIcon()
         detail_memo.title = simpleMemo.getTitle()
         detail_memo.desc = simpleMemo.getDesc()
@@ -115,11 +119,11 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        when (requestCode) {
-            // 1. 상세 메모에서 돌아올 때 편집되었을 수 있으니 추가해야한다.
-            DETAILMEMO -> {
-                // UPDATE로 메모 업데이트
-            }
+        if(resultCode == Activity.RESULT_OK)
+        {
+            // UPDATE로 메모 업데이트
+            Log.d("test1", "여기들어오긴하니...?")
+            updateDB(data)
         }
     }
 
@@ -149,9 +153,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun addItem(iconPath: ByteArray, title: String, desc: String) {
+    public fun addItem(memoIdx:Int, iconPath: ByteArray, title: String, desc: String) {
         var item = RecyclerItem()
 
+        item.setIdx(memoIdx)
         item.setIcon(iconPath)
         item.setTitle(title)
         item.setDesc(desc)
@@ -174,16 +179,18 @@ class MainActivity : AppCompatActivity() {
         var c: Cursor? = memodb?.rawQuery(sql, null)
 
         while (c?.moveToNext()!!) {
+            var idx_pos = c.getColumnIndex("idx")
             var img_pos = c.getColumnIndex("image")
             var title_pos = c.getColumnIndex("title")
             var desc_pos = c.getColumnIndex("description")
 
+            var idx = c.getInt(idx_pos)
             var imgData = c.getBlob(img_pos)
             var titleData = c.getString(title_pos)
             var descData = c.getString(desc_pos)
 
             // 리스트 출력!
-            addItem(imgData, titleData, descData)
+            addItem(idx, imgData, titleData, descData)
         }
         //}} 20200221
     }
@@ -203,9 +210,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 수정완료되었기 때문에 DB업데이트
-    private fun updateDB(modifiedMemo : Intent?)
-    {
-       // var sql ="update memolist set "
+    private fun updateDB(modifiedMemo : Intent?) {
+        //객체 받아오기
+        var memo = modifiedMemo?.getParcelableExtra<DetailMemoClass>("modifiedMemo")
+
+        var contentValues = ContentValues()
+        contentValues.put("title", memo?.title)
+        contentValues.put("description", memo?.desc)
+
+        var nameArr = arrayOf(memo?.idx.toString())
+
+        var change = memodb?.update("memolist", contentValues, "idx=?", nameArr)
+
+        Log.d("test1", "${change}")
+        Log.d("test1", "${memo?.title}")
+        Log.d("test1", "${memo?.desc}")
     }
 }
 
