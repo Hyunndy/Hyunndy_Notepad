@@ -9,20 +9,20 @@ public class MemoItem {
 
     private var MemoIdx:Int = 0
     private var MemoIcon:ByteArray? = null
-    private var MemoTitle:String = ""
-    private var MemoDesc:String = ""
+    private var MemoTitle:String? = ""
+    private var MemoDesc:String? = ""
 
-    public fun setIcon(IconPath:ByteArray)
+    public fun setIcon(IconPath:ByteArray?)
     {
         MemoIcon = IconPath
     }
 
-    public fun setTitle(title:String)
+    public fun setTitle(title:String?)
     {
         MemoTitle = title
     }
 
-    public  fun setDesc(desc:String)
+    public  fun setDesc(desc:String?)
     {
         MemoDesc = desc
     }
@@ -36,11 +36,11 @@ public class MemoItem {
         return MemoIcon
     }
 
-    public fun getTitle() : String{
+    public fun getTitle() : String?{
         return MemoTitle
     }
 
-    public  fun getDesc() : String{
+    public  fun getDesc() : String?{
         return MemoDesc
     }
 

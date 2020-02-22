@@ -23,9 +23,6 @@ import org.w3c.dom.Text
 import com.example.hyunndy_notepad.MemoItem as RecyclerItem
 
 
- //1. 어댑터 구현.
- //2. 리사이클러뷰에서는 반드시 개발자가 어댑터를 직접 구현해야 한다.
-// Unit은 아무것도 반환하지 않는다는것이다.
 public class NotepadAdapter(val itemClick : (RecyclerItem) -> Unit) : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()
 {
     private var updateMemolist = arrayListOf<RecyclerItem>()

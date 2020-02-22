@@ -38,6 +38,7 @@ class NewMemoActivity : AppCompatActivity() {
         var newDesc:EditText = findViewById(R.id.newdesc)
 
 
+        // 이미지 추가칸
         fab.setOnClickListener { view ->
             Snackbar.make(view, "저장버튼", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
@@ -49,10 +50,9 @@ class NewMemoActivity : AppCompatActivity() {
                 newMemo.title = newTitle.text.toString()
                 newMemo.desc = newTitle.text.toString()
 
-                // 전달하기. 타이틀만 던져서 타이틀에서 찾도록하자.
                 var intent = Intent()
                 intent.putExtra("newMemo", newMemo)
-                setResult(Activity.MODE_APPEND, intent)
+                setResult(Activity.RESULT_OK, intent)
             }
         }
 
@@ -60,7 +60,7 @@ class NewMemoActivity : AppCompatActivity() {
         button.setOnClickListener { view ->
             var intent = Intent(Intent.ACTION_PICK)
             intent.type = android.provider.MediaStore.Images.Media.CONTENT_TYPE
-            startActivityForResult(intent, 0)
+            startActivityForResult(intent, REQUESTCODE.OPEN_GALLERY.value)
         }
     }
 
@@ -68,7 +68,7 @@ class NewMemoActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         // 앨범선택칸에서 다시 돌아왔을 때.
-        if(requestCode == 0)
+        if(requestCode == REQUESTCODE.OPEN_GALLERY.value)
         {
             var c = contentResolver.query(data?.data!!, null, null, null, null)
             c?.moveToNext()
@@ -84,8 +84,6 @@ class NewMemoActivity : AppCompatActivity() {
             val stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
             newImageByteCode = stream.toByteArray()
-
-
         }
     }
 
@@ -103,21 +101,3 @@ class NewMemoActivity : AppCompatActivity() {
     }
 
 }
-
-/*
-SQLiteDatabase mclassDB1 = this.openOrCreateDatabase("myassign1", MODE_PRIVATE, null);
-Cursor cursor = mclassDB1.rawQuery("SELECT * FROM myassign1", null);
-
-ArrayList<String> msubject1List = new ArrayList<>();
-ArrayList<String> mday1List     = new ArrayList<>();
-
-if (cursor != null) {
-    if (cursor.moveToFirst()) {
-        do {
-            msubject1List.add(cursor.getString(cursor.getColumnIndex("msubject1")));
-            mday1List.add(cursor.getString(cursor.getColumnIndex("mday1List")));
-        } while (cursor.moveToNext());
-    }
-    cursor.close();
-}
- */
