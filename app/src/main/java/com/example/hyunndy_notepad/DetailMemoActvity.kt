@@ -1,12 +1,10 @@
 package com.example.hyunndy_notepad
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,7 +17,7 @@ import java.io.ByteArrayOutputStream
 class DetailMemoActvity : AppCompatActivity() {
 
     var isModified = false
-    var detailMemo = DetailMemoClass()
+    private lateinit var detailMemo:DetailMemoClass
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +41,7 @@ class DetailMemoActvity : AppCompatActivity() {
                 editMemo()
                 true
             }
-            R.id.save_memo ->
+            R.id.add_memo ->
             {
                 completeModification()
                 true
@@ -61,7 +59,8 @@ class DetailMemoActvity : AppCompatActivity() {
     }
     private fun showMemo()
     {
-        detailMemo = intent.getParcelableExtra<DetailMemoClass>("DetailMemo")
+        detailMemo = DetailMemoClass()
+        detailMemo = intent.getParcelableExtra<DetailMemoClass>("DetailMemo")!!
 
         var bitmap = BitmapFactory.decodeByteArray(detailMemo.imagesrc, 0, detailMemo.imagesrc?.size!!)
         bitmap = resizeBitmap(480, bitmap)
@@ -111,7 +110,7 @@ class DetailMemoActvity : AppCompatActivity() {
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
-        detailMemo?.imagesrc = stream.toByteArray()
+        detailMemo.imagesrc = stream.toByteArray()
     }
 
     // 메모 편집 완료( EDITTEXT -> TEXTVIEW )
@@ -121,7 +120,7 @@ class DetailMemoActvity : AppCompatActivity() {
         detail_edittitle.visibility = View.GONE
         detail_title.text = detail_edittitle.text
 
-        detailMemo?.title = detail_title.text.toString()
+        detailMemo.title = detail_title.text.toString()
     }
 
     // 메모 편집 완료
@@ -132,7 +131,7 @@ class DetailMemoActvity : AppCompatActivity() {
 
         detail_desc.text = detail_editdesc.text
 
-        detailMemo?.desc = detail_desc.text.toString()
+        detailMemo.desc = detail_desc.text.toString()
     }
 
     override fun onBackPressed() {

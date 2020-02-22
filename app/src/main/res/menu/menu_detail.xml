@@ -13,7 +13,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/save_memo"
+        android:id="@+id/add_memo"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_save"
         android:orderInCategory="200"

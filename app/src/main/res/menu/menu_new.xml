@@ -1,14 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.hyunndy_notepad.MainActivity">
+    tools:context="com.example.hyunndy_notepad.NewMemoActivity">
 
     <item
         android:id="@+id/add_memo"
         android:enabled="true"
-        android:icon="@drawable/plus_icon2"
-        android:orderInCategory="100"
+        android:icon="@android:drawable/ic_menu_save"
+        android:orderInCategory="200"
         android:title="add_memo"
         android:visible="true"
         app:showAsAction="always" />
+
 </menu>

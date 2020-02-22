@@ -101,9 +101,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         return when (item.itemId) {
-            R.id.action_settings -> {
-                true
-            }
             R.id.add_memo -> {
                 var intent = Intent(this, NewMemoActivity::class.java)
                 startActivityForResult(intent, REQUESTCODE.NEW_MEMO.value)
