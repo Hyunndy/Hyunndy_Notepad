@@ -8,72 +8,97 @@
     tools:context=".DetailMemoActvity"
     tools:showIn="@layout/activity_detail_memo_actvity">
 
-    <TextView
-        android:id="@+id/detail_title"
+    <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
-        android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_height="0dp"
+        android:fillViewport="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-        android:id="@+id/detail_edittitle"
-        android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/linear_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:addStatesFromChildren="false"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/detail_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:ems="100"
+                android:inputType="textPersonName"
+                android:text="Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+            <EditText
+                android:id="@+id/detail_edittitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:ems="100"
+                android:inputType="textPersonName"
+                android:text="Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/detail_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:ems="100"
+                android:inputType="textPersonName"
+                android:text="dqwdqd" />
+
+            <EditText
+                android:id="@+id/detail_editdesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:ems="100"
+                android:inputType="textPersonName"
+                android:text="dqwdqd"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/detail_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal|center_vertical"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="50dp"
+                android:adjustViewBounds="true"
+                app:srcCompat="@drawable/jellybean" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/addImageBtn"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
-        android:text="EditView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_marginBottom="30dp"
+        android:padding="0dp"
+        android:text="ADD_IMAGE"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <TextView
-        android:id="@+id/detail_desc"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
-        android:text="내용"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/detail_title" />
-
-    <EditText
-        android:id="@+id/detail_editdesc"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
-        android:text="내용"
-        android:visibility="gone"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/detail_edittitle" />
-
-    <ImageView
-        android:id="@+id/detail_image"
-        android:layout_width="255dp"
-        android:layout_height="217dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="50dp"
-        android:adjustViewBounds="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_desc"
-        app:srcCompat="@drawable/jellybean" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
