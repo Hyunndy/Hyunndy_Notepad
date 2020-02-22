@@ -56,6 +56,9 @@ class MainActivity : AppCompatActivity() {
     var helper: NotepadDBHelper? = null
     var memodb: SQLiteDatabase? = null
 
+    //번호
+    var selectedTitle = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -77,11 +80,13 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView = findViewById(R.id.recyclerView)
         mRecyclerView?.layoutManager = LinearLayoutManager(this)
 
-        mRecyclerAdapter = RecyclerAdapter{ openDetailMemo(it) }
-
-        readDB()
+        mRecyclerAdapter = RecyclerAdapter{ selectedItem,selectedPosition->
+            openDetailMemo(selectedItem, selectedPosition)
+        }
 
         mRecyclerView?.adapter = mRecyclerAdapter
+
+        readDB()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -110,15 +115,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openDetailMemo(simpleMemo: RecyclerItem) {
+    private fun openDetailMemo(selectedItem: RecyclerItem, selectedIdx : Int) {
         var detail_memo = DetailMemoClass()
 
-        detail_memo.idx = simpleMemo.getIdx()
-        detail_memo.imagesrc = simpleMemo.getIcon()
-        detail_memo.title = simpleMemo.getTitle()
-        detail_memo.desc = simpleMemo.getDesc()
+        selectedTitle = selectedItem.getTitle()
+       // detail_memo.idx = selectedIdx
+        detail_memo.imagesrc = selectedItem.getIcon()
+        detail_memo.title = selectedItem.getTitle()
+        detail_memo.desc = selectedItem.getDesc()
 
-        Log.d("test1", "open 상세메모에서의 인덱스 = ${detail_memo.idx}")
+        //Log.d("test1", "open 상세메모에서의 인덱스 = ${detail_memo.idx}")
 
         var intent = Intent(this, DetailMemoActvity::class.java)
         intent.putExtra("DetailMemo", detail_memo)
@@ -141,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     RESULTCODE.DELETE_MEMO.value ->
                     {
+                        Log.d("test2", "onActivityResult")
                         deleteDB(data!!)
                     }
                 }
@@ -148,7 +155,10 @@ class MainActivity : AppCompatActivity() {
             }
             REQUESTCODE.NEW_MEMO.value ->
             {
-                insertDB(data)
+                if(data != null)
+                {
+                    insertDB(data)
+                }
             }
         }
     }
@@ -158,34 +168,26 @@ class MainActivity : AppCompatActivity() {
     //-------------------------------------------------------------------------------------------------------
     private fun deleteDB(data : Intent)
     {
-        var deleteIdx = data.getIntExtra("deleteMemo", -1)
-        if(deleteIdx < 0)
-        {
-            return
-        }
+        var deleteTitle = data.getStringExtra("deleteMemo")!!
 
-        var temp = memodb?.delete("memolist","idx=?", arrayOf(deleteIdx.toString()))
+        var temp = memodb?.delete("memolist","title=?", arrayOf(deleteTitle))
 
-        updateItem(deleteIdx, null, null, null, UPDATEITEM.DELETE)
+        Log.d("test2", "tem의 값 = ${temp}")
+
+        updateItem(null,  deleteTitle, null, UPDATEITEM.DELETE)
     }
-    private fun updateItem(memoIdx:Int, iconPath: ByteArray?, title: String?, desc: String?, updateCode:UPDATEITEM) {
+    private fun updateItem(/*memoIdx:Int,*/ iconPath: ByteArray?, title: String, desc: String?, updateCode:UPDATEITEM) {
 
         if(updateCode == UPDATEITEM.DELETE)
         {
-            if(mList.size == 1)
-            {
-                mList.clear()
-            }
-            else
-            {
-                mList.removeAt(memoIdx)
-            }
+            mList.clear()
+            readDB()
         }
         else
         {
             var item = RecyclerItem()
 
-            item.setIdx(memoIdx)
+            //item.setIdx(memoIdx)
             item.setIcon(iconPath)
             item.setTitle(title)
             item.setDesc(desc)
@@ -194,12 +196,14 @@ class MainActivity : AppCompatActivity() {
             {
                 UPDATEITEM.READ, UPDATEITEM.ADD ->
                 {
-                    Log.d("test1", "인덱스 시발 관리하기 존나귀찮아 = ${memoIdx}")
+                   // Log.d("test1", "인덱스 시발 관리하기 존나귀찮아 = ${memoIdx}")
                     mList.add(item)
                 }
                 UPDATEITEM.EDIT ->
                 {
-                    mList[memoIdx] = item
+                    mList.clear()
+                    readDB()
+                    //mList[memoIdx] = item
                 }
             }
         }
@@ -213,18 +217,18 @@ class MainActivity : AppCompatActivity() {
         var c: Cursor? = memodb?.rawQuery(sql, null)
 
         while (c?.moveToNext()!!) {
-            var idx_pos = c.getColumnIndex("idx")
+            //var idx_pos = c.getColumnIndex("idx")
             var img_pos = c.getColumnIndex("image")
             var title_pos = c.getColumnIndex("title")
             var desc_pos = c.getColumnIndex("description")
 
-            var idx = c.getInt(idx_pos)
+           // var idx = c.getInt(idx_pos)
             var imgData = c.getBlob(img_pos)
             var titleData = c.getString(title_pos)
             var descData = c.getString(desc_pos)
 
             // 리스트 출력!
-            updateItem(idx, imgData, titleData, descData, UPDATEITEM.READ)
+            updateItem(imgData, titleData, descData, UPDATEITEM.READ)
         }
     }
 
@@ -236,42 +240,46 @@ class MainActivity : AppCompatActivity() {
         contentValues.put("title", memo?.title)
         contentValues.put("description", memo?.desc)
 
-        var nameArr = arrayOf(memo.idx.toString())
+       var nameArr = arrayOf(selectedTitle)
 
-        var change = memodb?.update("memolist", contentValues, "idx=?", nameArr)
+        var change = memodb?.update("memolist", contentValues, "title=?", nameArr)
 
-        Log.d("test1", "update 쿼리문에서의 인덱스 = ${memo.idx}")
-
-        updateItem(memo.idx, memo.imagesrc, memo.title, memo.desc,UPDATEITEM.EDIT)
-
+        updateItem(memo.imagesrc, memo.title, memo.desc,UPDATEITEM.EDIT)
     }
 
     private fun insertDB(modifiedMemo: Intent?)
     {
         var memo = modifiedMemo?.getParcelableExtra<DetailMemoClass>("newMemo")
 
+        Log.d("test1", memo?.title)
+        Log.d("test1", memo?.desc)
+
         var contentValues = ContentValues()
-        contentValues.put("idx", mList.size)
+       // contentValues.put("idx", mList.size)
         contentValues.put("image", memo?.imagesrc)
         contentValues.put("title", memo?.title)
         contentValues.put("description", memo?.desc)
 
         memodb?.insert("memolist", null, contentValues)
 
-        var c: Cursor? = memodb?.rawQuery("select * from memolist where title = ?", arrayOf(memo?.title))
+       var  title = (memo?.title)
+
+        var c: Cursor? = memodb?.rawQuery("select * from memolist where title = ?", arrayOf(title))
 
         while (c?.moveToNext()!!) {
-            var idx_pos = c.getColumnIndex("idx")
+           // var idx_pos = c.getColumnIndex("idx")
             var img_pos = c.getColumnIndex("image")
             var title_pos = c.getColumnIndex("title")
             var desc_pos = c.getColumnIndex("description")
 
-            var idx = c.getInt(idx_pos)
+            Log.d("test1", "insertDB에서의 인덱스 ")
+
+           // var idx = c.getInt(idx_pos)
             var imgData = c.getBlob(img_pos)
             var titleData = c.getString(title_pos)
             var descData = c.getString(desc_pos)
 
-            updateItem(idx, imgData, titleData, descData, UPDATEITEM.ADD)
+            updateItem(imgData, titleData, descData, UPDATEITEM.ADD)
         }
     }
 

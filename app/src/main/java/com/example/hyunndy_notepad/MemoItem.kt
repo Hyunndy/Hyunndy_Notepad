@@ -7,9 +7,9 @@ import android.graphics.drawable.Drawable
 // 1개의 이미지 뷰, 두 개의 텍스트뷰.
 public class MemoItem {
 
-    private var MemoIdx:Int = 0
+   // private var MemoIdx:Int = 0
     private var MemoIcon:ByteArray? = null
-    private var MemoTitle:String? = ""
+    private var MemoTitle:String = ""
     private var MemoDesc:String? = ""
 
     public fun setIcon(IconPath:ByteArray?)
@@ -17,7 +17,7 @@ public class MemoItem {
         MemoIcon = IconPath
     }
 
-    public fun setTitle(title:String?)
+    public fun setTitle(title:String)
     {
         MemoTitle = title
     }
@@ -27,16 +27,16 @@ public class MemoItem {
         MemoDesc = desc
     }
 
-    public fun setIdx(Idx: Int)
-    {
-        MemoIdx = Idx
-    }
+   //public fun setIdx(Idx: Int)
+   //{
+   //    MemoIdx = Idx
+   //}
 
     public fun getIcon() : ByteArray?{
         return MemoIcon
     }
 
-    public fun getTitle() : String?{
+    public fun getTitle() : String{
         return MemoTitle
     }
 
@@ -44,7 +44,7 @@ public class MemoItem {
         return MemoDesc
     }
 
-    public  fun getIdx() : Int{
-        return MemoIdx
-    }
+//    public  fun getIdx() : Int{
+//        return MemoIdx
+//    }
 }

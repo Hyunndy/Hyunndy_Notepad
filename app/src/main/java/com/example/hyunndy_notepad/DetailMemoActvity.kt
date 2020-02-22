@@ -74,7 +74,7 @@ class DetailMemoActvity : AppCompatActivity() {
     private fun deleteMemo()
     {
         var intent = Intent()
-        intent.putExtra("deleteMemo", detailMemo.idx)
+        intent.putExtra("deleteMemo", detailMemo.title)
 
         setResult(RESULTCODE.DELETE_MEMO.value, intent)
         finish()

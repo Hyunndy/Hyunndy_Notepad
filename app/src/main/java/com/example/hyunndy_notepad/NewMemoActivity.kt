@@ -43,7 +43,7 @@ class NewMemoActivity : AppCompatActivity() {
             Snackbar.make(view, "저장버튼", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
 
-            if(newImageByteCode != null)
+            if(newtitle.text != null)
             {
                 var newMemo = DetailMemoClass()
                 newMemo.imagesrc = newImageByteCode
@@ -52,7 +52,7 @@ class NewMemoActivity : AppCompatActivity() {
 
                 var intent = Intent()
                 intent.putExtra("newMemo", newMemo)
-                setResult(Activity.RESULT_OK, intent)
+                setResult(REQUESTCODE.NEW_MEMO.value, intent)
             }
         }
 
@@ -71,6 +71,7 @@ class NewMemoActivity : AppCompatActivity() {
         if(requestCode == REQUESTCODE.OPEN_GALLERY.value)
         {
             var c = contentResolver.query(data?.data!!, null, null, null, null)
+
             c?.moveToNext()
 
             var index = c?.getColumnIndex(MediaStore.Images.Media.DATA)

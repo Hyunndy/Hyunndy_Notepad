@@ -23,7 +23,7 @@ import org.w3c.dom.Text
 import com.example.hyunndy_notepad.MemoItem as RecyclerItem
 
 
-public class NotepadAdapter(val itemClick : (RecyclerItem) -> Unit) : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()
+public class NotepadAdapter(val itemClick: (RecyclerItem, Int) -> Unit)  : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()
 {
     private var updateMemolist = arrayListOf<RecyclerItem>()
 
@@ -43,8 +43,9 @@ public class NotepadAdapter(val itemClick : (RecyclerItem) -> Unit) : RecyclerVi
         notifyDataSetChanged()
     }
 
+
     // 뷰홀더
-     inner class NotePadViewHolder(val memoItem : View, itemClick: (RecyclerItem) -> Unit) : RecyclerView.ViewHolder(memoItem) {
+     inner class NotePadViewHolder(var memoItem:View, var itemClick: (RecyclerItem, Int) -> Unit) : RecyclerView.ViewHolder(memoItem) {
         val image = memoItem?.findViewById<ImageView>(R.id.imageView2)
         val title = memoItem?.findViewById<TextView>(R.id.textView)
         val desc = memoItem?.findViewById<TextView>(R.id.textView3)
@@ -69,7 +70,9 @@ public class NotepadAdapter(val itemClick : (RecyclerItem) -> Unit) : RecyclerVi
 
             // 메모하나가 클릭됐을 때 처리할 일을 itemClick으로 설정한다.
             // (RecyclerItem) -> Unit에 대한 함수는 나중에 mainactivity.kt에서 작성한다.
-            memoItem.setOnClickListener{ itemClick(Items) }
+            memoItem.setOnClickListener{ it ->
+                itemClick(Items, adapterPosition)
+            }
         }
     }
 
@@ -84,7 +87,7 @@ public class NotepadAdapter(val itemClick : (RecyclerItem) -> Unit) : RecyclerVi
         //  context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         // Inflater로 view 생성
-        var memoview = LayoutInflater.from(parent.context).inflate(R.layout.notepad_item, parent, false)
+        val memoview = LayoutInflater.from(parent.context).inflate(R.layout.notepad_item, parent, false)
 
         // view를 리턴.
         return NotePadViewHolder(memoview, itemClick)

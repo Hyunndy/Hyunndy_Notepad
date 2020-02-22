@@ -6,9 +6,9 @@ import android.os.Parcelable
 // Parcelable 인터페이스 구현
 class DetailMemoClass : Parcelable{
 
-    var idx:Int = 0
+   // var idx:Int = 0
     var imagesrc:ByteArray? = null
-    var title:String? = null
+    var title:String = ""!!
     var desc:String? = null
 
     companion object
@@ -22,9 +22,9 @@ class DetailMemoClass : Parcelable{
 
                 val memo = DetailMemoClass()
 
-                memo.idx = source?.readInt()!!
+               // memo.idx = source?.readInt()!!
                 memo.imagesrc = source?.createByteArray()
-                memo.title = source?.readString()
+                memo.title = source?.readString()!!
                 memo.desc = source?.readString()
 
                 return memo
@@ -42,7 +42,7 @@ class DetailMemoClass : Parcelable{
 
         //데이터를 넣자.
         //이거 0 값이 들어가면 우짜노?
-        dest?.writeInt(idx)
+        //dest?.writeInt(idx)
         dest?.writeByteArray(imagesrc)
         dest?.writeString(title)
         dest?.writeString(desc)
