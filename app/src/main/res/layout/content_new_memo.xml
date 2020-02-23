@@ -59,6 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
@@ -100,17 +101,7 @@
                     android:text="DELETE" />
             </RelativeLayout>
 
-            <ImageView
-                android:id="@+id/newImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|center_horizontal|center_vertical"
-                android:layout_marginStart="50dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginEnd="50dp"
-                android:layout_marginBottom="25dp"
-                android:adjustViewBounds="true"
-                app:srcCompat="@drawable/jellybean" />
+
 
         </LinearLayout>
 

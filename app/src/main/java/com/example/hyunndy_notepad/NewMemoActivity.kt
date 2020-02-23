@@ -74,7 +74,7 @@ class NewMemoActivity : AppCompatActivity() {
         imagedb = helper?.writableDatabase
 
 
-        // ~앨범 추가칸~
+        // 이미지 추가 칸.
         addImageBtn.setOnClickListener {
             // 1. AlertDialogue
             val builder = AlertDialog.Builder(this)
@@ -119,18 +119,24 @@ class NewMemoActivity : AppCompatActivity() {
             builder.create()
             builder.show()
         }
+
+        // 이미지 삭제 칸.
+        deleteImgBtn.setOnClickListener {
+            nimage--
+            linear_image.removeViewAt(3+nimage)
+        }
     }
 
     private fun selectImageView(bitmap: Bitmap) {
         // 이 때는 썸네일
-        if (nimage == 0) {
-            newImage.setImageBitmap(bitmap)
-        } else {
+        //if (nimage == 0) {
+        //    newImage.setImageBitmap(bitmap)
+       // } else {
             val addedImageView = ImageView(this)
             addedImageView.setImageBitmap(bitmap)
 
             linear_image.addView(addedImageView)
-        }
+        //}
     }
 
     // **HYEONJIY** 1. db에 테이블 새로 추가해서 2. n개의 이미지 로딩하기. 3. 안되면 이 주석이 달린걸 삭제하세용
