@@ -1,20 +1,32 @@
 package com.example.hyunndy_notepad
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 
 import kotlinx.android.synthetic.main.activity_detail_memo_actvity.*
 import kotlinx.android.synthetic.main.content_detail_memo_actvity.*
@@ -36,6 +48,8 @@ class DetailMemoActvity : AppCompatActivity() {
     private var nimage:Int = 0
     //**
 
+    private var imageURL = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +67,80 @@ class DetailMemoActvity : AppCompatActivity() {
 
         // **HYEONJIY** DB를 읽어서 BLOB를 비트맵으로 전환해서 IMAGEVIEW추가되는거에 넣어야한다.
         showMemo()
+
+
+        //**HYEONJIY** 버튼이벤트를 만든다!
+        // 추가 이벤트.
+        addImageBtn_detail.setOnClickListener { view ->
+            // 1. AlertDialogue
+            val builder = AlertDialog.Builder(this)
+
+            builder.setTitle("이미지를 무엇으로 추가하시겠습니까?").setItems(
+                arrayOf("GALLERY", "CAMERA", "URL"),
+                DialogInterface.OnClickListener { _, which ->
+                    when (which) {
+                        0 -> {
+                            getPicturefromGallery()
+                        }
+                        1 -> {
+                            takePicture()
+                        }
+                        2 -> {
+                            // 1. 여기서 버튼 클릭 버튼 만들고, 리스너 세팅해서 getImageFromURL()
+                            url_new_detail.visibility =  View.VISIBLE
+                            url_new_detail.setOnEditorActionListener { v, actionId, event ->
+                                if(actionId == EditorInfo.IME_ACTION_DONE)
+                                {
+                                    url_new_detail.visibility = View.GONE
+                                    imageURL = v.text.toString()
+                                    if(imageURL.isEmpty())
+                                    {
+                                        false
+                                    }
+                                    else
+                                    {
+                                        getImageFromURL()
+                                        true
+                                    }
+                                }
+                                else
+                                {
+                                    url_new_detail.visibility = View.GONE
+                                    false
+                                }
+                            }
+                        }
+                    }
+                })
+            builder.create()
+            builder.show()
+
+        }
+
+        deleteImgBtn_detail.setOnClickListener { view ->
+            if(nimage > 0)
+            {
+                nimage--
+                var deletedImageView:ImageView? = linear_image_detail[5+nimage] as ImageView
+                if(deletedImageView != null)
+                {
+                    linear_image_detail.removeView(deletedImageView)
+                    newImageByteCode.removeAt(newImageByteCode.size-1)
+                }
+            }
+        }
+    }
+
+    private fun getPicturefromGallery() {
+        var intent = Intent(Intent.ACTION_PICK)
+        intent.type = android.provider.MediaStore.Images.Media.CONTENT_TYPE
+        startActivityForResult(intent, REQUESTCODE.OPEN_GALLERY.value)
+    }
+
+    // 2. 카메라로 사진찍기
+    private fun takePicture() {
+        var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(intent, REQUESTCODE.OPEN_CAMERA.value)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -65,12 +153,15 @@ class DetailMemoActvity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.edit_memo ->
             {
+                // 이미지 첨부란이 갑자기 띠용
+                detail_edit_Image.visibility = View.VISIBLE
                 isModified = true
                 editMemo()
                 true
             }
             R.id.save_memo_detail ->
             {
+                detail_edit_Image.visibility = View.GONE
                 completeModification()
                 true
             }
@@ -87,7 +178,7 @@ class DetailMemoActvity : AppCompatActivity() {
     }
 
     //** HYEONJIY** 여기서 imagelist DB를 읽어서 image를 읽어야한다.
-    // 그러려면 얘도 ImageView를 추가해줘야겠지? ㅆㅄㅂㅆㅃ
+
     private fun showMemo()
     {
         detailMemo = DetailMemoClass()
@@ -96,16 +187,12 @@ class DetailMemoActvity : AppCompatActivity() {
         detail_title.text = detailMemo.title
         detail_desc.text = detailMemo.desc
 
-        // **HYEONJIY**
+        // **HYEONJIY** 썸네일 이제 없앨거니까!
        if(detailMemo.thumbnailsrc != null)
        {
            var bitmap = BitmapFactory.decodeByteArray(detailMemo.thumbnailsrc, 0, detailMemo.thumbnailsrc?.size!!)
            bitmap = resizeBitmap(480, bitmap)
 
-           // **HYEONJIY** 메인으로부터받은 썸네일은 그냥 여기다가 둔다.
-           detail_image.setImageBitmap(bitmap)
-
-           //**HYEONJIY** 썸네일을 선택했으면 이제 DB를 읽어서 이미지뷰를 추가한다.
            readDB()
            addImageView()
        }
@@ -135,11 +222,6 @@ class DetailMemoActvity : AppCompatActivity() {
     {
         for((idx, image) in newImageByteCode.withIndex())
         {
-            if(idx==0)
-            {
-                continue
-            }
-
             var addedImageView = ImageView(this)
             var Bitmap = BitmapFactory.decodeByteArray(image, 0, image.size)
 
@@ -149,6 +231,7 @@ class DetailMemoActvity : AppCompatActivity() {
                 addedImageView.setImageBitmap(Bitmap)
 
                 linear_image_detail.addView(addedImageView)
+                nimage++
             }
             Log.d("test2", "디테일에서 이미지가 추가됩니다.")
         }
@@ -188,12 +271,27 @@ class DetailMemoActvity : AppCompatActivity() {
     // 이미지 수정 완료
     private fun completeImage()
     {
-        val tempImage = detail_image.drawable as BitmapDrawable
-        val bitmap = tempImage.bitmap
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+        //**HYEONJIY** 이미지가 존재 한다면
+        if(nimage > 0)
+        {
+            var thumbnailView:ImageView? = linear_image_detail[5] as ImageView
+            if(thumbnailView != null)
+            {
+                val thumbnail:BitmapDrawable? = thumbnailView.drawable as BitmapDrawable
+                if(thumbnail != null)
+                {
+                    val bitmap = thumbnail.bitmap
+                    val stream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
-        detailMemo.thumbnailsrc = stream.toByteArray()
+                    detailMemo.thumbnailsrc = stream.toByteArray()
+                }
+            }
+        }
+        else
+        {
+            detailMemo.thumbnailsrc = null
+        }
     }
 
     // 메모 편집 완료( EDITTEXT -> TEXTVIEW )
@@ -217,7 +315,37 @@ class DetailMemoActvity : AppCompatActivity() {
         detailMemo.desc = detail_desc.text.toString()
     }
 
+    private fun updateImageDB()
+    {
+        // 1. 일단 날린다.
+        val deletedTitle = detail_title.text.toString()
+        imagedb?.delete("imagelist", "title=?",arrayOf(deletedTitle))
+
+        // 2. 그 다음 넣는다.
+        var contentValues = ContentValues()
+
+        for ((idx, image) in newImageByteCode.withIndex()) {
+            // 1. title 등록.
+            contentValues.put("title", detail_title.text.toString())
+
+            // 2. 이미지 등록
+            contentValues.put("image", image)
+
+            // 3. 인덱스 등록
+            contentValues.put("imageIdx", idx)
+
+            // 4. db에 넣자! 그리고 이걸 detailmemo에서 꺼내쓰면 된다.
+            imagedb?.insert("imagelist", null, contentValues)
+        }
+
+    }
+
     override fun onBackPressed() {
+
+        // detailImage를 또 클릭했을 경우를 위해 소통을 위해 imagedb업뎃해줘야함.
+        updateImageDB()
+
+        // 메인에 보내줄 애들.
         if(isModified)
         {
             var intent = Intent()
@@ -240,15 +368,105 @@ class DetailMemoActvity : AppCompatActivity() {
     }
 
     // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
-    private fun resizeBitmap(targetWidth : Int, source: Bitmap) : Bitmap
-    {
+    private fun resizeBitmap(targetWidth: Int, source: Bitmap, isURL:Boolean=false): Bitmap {
         var ratio = source.height.toDouble() / source.width.toDouble()
         var targetHeight = (targetWidth * ratio).toInt()
         var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
-        if(result != source)
+        if (result != source && !isURL)
         {
             source.recycle()
         }
         return result
     }
+
+    // 3. 사진 선택 뷰에서 돌아왔을 때.
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // 앨범선택칸에서 다시 돌아왔을 때.
+        when (requestCode) {
+            REQUESTCODE.OPEN_GALLERY.value -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    var c = contentResolver.query(data?.data!!, null, null, null, null)
+                    c?.moveToNext()
+
+                    var index = c?.getColumnIndex(MediaStore.Images.Media.DATA)
+                    var source = c?.getString(index!!)
+
+                    val stream = ByteArrayOutputStream()
+
+                    var bitmap = BitmapFactory.decodeFile(source)
+                    bitmap = resizeBitmap(480, bitmap)
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+
+                    selectImageView(bitmap)
+
+                    newImageByteCode.add(nimage, stream.toByteArray())
+                    nimage++
+                }
+            }
+
+            REQUESTCODE.OPEN_CAMERA.value -> {
+                // 정상코드
+                if (resultCode == Activity.RESULT_OK) {
+                    val stream = ByteArrayOutputStream()
+
+                    // ** HYEONJIY ** 일단 안되니까 깨져도 이걸로 가자.
+                    var bitmap = data?.getParcelableExtra<Bitmap>("data")!!
+                    bitmap = resizeBitmap(480, bitmap)
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                    selectImageView(bitmap)
+                    newImageByteCode.add(nimage, stream.toByteArray())
+                    nimage++
+                }
+            }
+        }
+    }
+
+    //{{ @HYEONJIY 5. 외부 URL 관련은 GLIDE
+    //---------------------------------------------------------------------------------------------------------------
+    private fun getImageFromURL()
+    {
+        Glide.with(this).asBitmap().load(imageURL).error(R.mipmap.ic_launcher).into( object : CustomTarget<Bitmap>()
+        {
+            override fun onLoadCleared(placeholder: Drawable?)
+            {
+            }
+
+            override fun onLoadFailed(errorDrawable: Drawable?) {
+                super.onLoadFailed(errorDrawable)
+
+                Toast.makeText(applicationContext, "잘못된 URL 입니다.", Toast.LENGTH_LONG).show();
+            }
+
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?)
+            {
+                var stream = ByteArrayOutputStream()
+                var bitmap = resizeBitmap(480, resource, true)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+
+                selectImageView(bitmap)
+
+                newImageByteCode.add(nimage, stream.toByteArray())
+                nimage++
+
+            }
+        })
+    }
+    //---------------------------------------------------------------------------------------------------------------
+    //}}
+
+    private fun selectImageView(bitmap: Bitmap) {
+        // 이 때는 썸네일
+        //if (nimage == 0) {
+        //    newImage.setImageBitmap(bitmap)
+        // } else {
+        val addedImageView = ImageView(this)
+        addedImageView.setImageBitmap(bitmap)
+
+        linear_image_detail.addView(addedImageView)
+        //}
+    }
+
+
 }

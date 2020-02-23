@@ -262,6 +262,7 @@ class MainActivity : AppCompatActivity() {
 
         var contentValues = ContentValues()
         contentValues.put("title", memo?.title)
+        contentValues.put("image", memo?.thumbnailsrc)
         contentValues.put("description", memo?.desc)
 
         var nameArr = arrayOf(selectedTitle)

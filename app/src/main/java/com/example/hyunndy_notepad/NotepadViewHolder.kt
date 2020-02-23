@@ -62,7 +62,7 @@ public class NotepadAdapter(val itemClick: (RecyclerItem, Int) -> Unit)  : Recyc
             }
             else
             {
-                image.setImageResource(R.mipmap.ic_launcher)
+                image.setImageBitmap(null)
             }
 
             title.text = Items.getTitle()
