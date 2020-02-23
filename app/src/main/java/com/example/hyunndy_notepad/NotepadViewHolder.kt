@@ -34,11 +34,11 @@ public class NotepadAdapter(val itemClick: (RecyclerItem, Int) -> Unit)  : Recyc
             this.updateMemolist.clear()
             this.updateMemolist.addAll(set)
         }
-        else
-        {
-            this.updateMemolist.clear()
-            this.updateMemolist = set
-        }
+       // else
+       // {
+       //     this.updateMemolist.clear()
+       //     this.updateMemolist.addAll(set)
+       // }
 
         notifyDataSetChanged()
     }
@@ -57,7 +57,7 @@ public class NotepadAdapter(val itemClick: (RecyclerItem, Int) -> Unit)  : Recyc
             {
                 var array = Items.getThumbnail()
                 var Bitmap = BitmapFactory.decodeByteArray(array, 0, array?.size!!)
-                Bitmap = resizeBitmap(480, Bitmap) // 이미지 조절 추가
+
                 image.setImageBitmap(Bitmap)
             }
             else
@@ -102,22 +102,8 @@ public class NotepadAdapter(val itemClick: (RecyclerItem, Int) -> Unit)  : Recyc
         holder.bind(updateMemolist[position])
     }
 
-
     // 전체 아이템 갯수 리턴
     override fun getItemCount(): Int {
         return updateMemolist.size
-    }
-
-    // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
-    private fun resizeBitmap(targetWidth : Int, source: Bitmap) : Bitmap
-    {
-        var ratio = source.height.toDouble() / source.width.toDouble()
-        var targetHeight = (targetWidth * ratio).toInt()
-        var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
-        if(result != source)
-        {
-            source.recycle()
-        }
-        return result
     }
 }

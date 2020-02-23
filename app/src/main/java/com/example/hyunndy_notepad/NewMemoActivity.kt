@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -138,16 +139,35 @@ class NewMemoActivity : AppCompatActivity() {
     }
 
     private fun selectImageView(bitmap: Bitmap) {
-        val addedImageView = ImageView(this)
+
+        var addedImageView = ImageView(this)
         addedImageView.setImageBitmap(bitmap)
 
+        Log.d("버그", "selectImageView")
         linear_image.addView(addedImageView)
     }
 
-    // **HYEONJIY** 1. db에 테이블 새로 추가해서 2. n개의 이미지 로딩하기. 3. 안되면 이 주석이 달린걸 삭제하세용
+    // 타이틀 검사.
+    private fun checkTitleoverlap() : Boolean
+    {
+        var title = newtitle.text.toString()
+        var c: Cursor? = imagedb?.rawQuery("select * from memolist where title =?", arrayOf(title))
+        if(c?.count!! > 0)
+        {
+            Toast.makeText(applicationContext, "제목이 동일한 메모가 있습니다.", Toast.LENGTH_LONG).show()
+            return true
+        }
+
+        return false
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.save_memo_new -> {
+                if(checkTitleoverlap()) {
+                    false
+                }
+
                 if (newtitle.text.isNotEmpty()) {
                     var newMemo = DetailMemoClass()
 
@@ -167,7 +187,7 @@ class NewMemoActivity : AppCompatActivity() {
                     intent.putExtra("newMemo", newMemo)
                     setResult(REQUESTCODE.NEW_MEMO.value, intent)
 
-                    Toast.makeText(applicationContext, "메모가 저장되었습니다.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(applicationContext, "메모가 저장되었습니다.", Toast.LENGTH_LONG).show()
                 }
                 true
             }
@@ -221,7 +241,8 @@ class NewMemoActivity : AppCompatActivity() {
         // 앨범선택칸에서 다시 돌아왔을 때.
         when (requestCode) {
             REQUESTCODE.OPEN_GALLERY.value -> {
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK)
+                {
                     var c = contentResolver.query(data?.data!!, null, null, null, null)
                     c?.moveToNext()
 
@@ -230,29 +251,43 @@ class NewMemoActivity : AppCompatActivity() {
 
                     val stream = ByteArrayOutputStream()
 
-                    var bitmap = BitmapFactory.decodeFile(source)
+                    var option = BitmapFactory.Options()
+                    option.inSampleSize = 1
+                    var bitmap = BitmapFactory.decodeFile(source, option)
                     bitmap = resizeBitmap(480, bitmap)
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                    if(bitmap != null)
+                    {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
-                    selectImageView(bitmap)
+                        selectImageView(bitmap)
 
-                    newImageByteCode.add(nimage, stream.toByteArray())
-                    nimage++
+                        newImageByteCode.add(nimage, stream.toByteArray())
+                        nimage++
+                        Log.d("버그", "오픈갤러리")
+                    }
+                    else
+                    {
+                        Toast.makeText(applicationContext, "이미지를 첨부할 수 없습니다.", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
             REQUESTCODE.OPEN_CAMERA.value -> {
-                // 정상코드
                 if (resultCode == Activity.RESULT_OK) {
                     val stream = ByteArrayOutputStream()
 
-                    // ** HYEONJIY ** 일단 안되니까 깨져도 이걸로 가자.
-                    var bitmap = data?.getParcelableExtra<Bitmap>("data")!!
-                    bitmap = resizeBitmap(480, bitmap)
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
-                    selectImageView(bitmap)
-                    newImageByteCode.add(nimage, stream.toByteArray())
-                    nimage++
+                    var bitmap = data?.getParcelableExtra<Bitmap>("data")
+                    bitmap = resizeBitmap(480, bitmap!!)
+                    if(bitmap != null)
+                    {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                        selectImageView(bitmap)
+                        newImageByteCode.add(nimage, stream.toByteArray())
+
+                        nimage++
+
+                        Log.d("버그", "오픈카메라")
+                    }
                 }
             }
         }
@@ -273,20 +308,22 @@ class NewMemoActivity : AppCompatActivity() {
             override fun onLoadFailed(errorDrawable: Drawable?) {
                 super.onLoadFailed(errorDrawable)
 
-                Toast.makeText(applicationContext, "잘못된 URL 입니다.", Toast.LENGTH_LONG).show();
+                Toast.makeText(applicationContext, "잘못된 URL 입니다.", Toast.LENGTH_LONG).show()
             }
 
             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?)
             {
                     var stream = ByteArrayOutputStream()
                     var bitmap = resizeBitmap(480, resource, true)
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                    if(bitmap != null)
+                    {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
-                    selectImageView(bitmap)
+                        selectImageView(bitmap)
 
-                    newImageByteCode.add(nimage, stream.toByteArray())
-                    nimage++
-
+                        newImageByteCode.add(nimage, stream.toByteArray())
+                        nimage++
+                    }
             }
         })
     }
@@ -294,14 +331,22 @@ class NewMemoActivity : AppCompatActivity() {
     //}}
 
     // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
-    private fun resizeBitmap(targetWidth: Int, source: Bitmap, isURL:Boolean=false): Bitmap {
+    private fun resizeBitmap(targetWidth: Int, source: Bitmap, isURL:Boolean=false): Bitmap? {
+
         var ratio = source.height.toDouble() / source.width.toDouble()
         var targetHeight = (targetWidth * ratio).toInt()
+
+        if(targetHeight == source.height)
+        {
+            targetHeight/=2
+        }
+
         var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
         if (result != source && !isURL)
         {
             source.recycle()
         }
+
         return result
     }
 
@@ -314,6 +359,7 @@ class NewMemoActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
+        Log.d("test300", "미연이가 여기서 튕기나?")
         imagedb?.close()
     }
 }

@@ -21,9 +21,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
+import androidx.core.view.marginTop
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -191,7 +193,7 @@ class DetailMemoActvity : AppCompatActivity() {
        if(detailMemo.thumbnailsrc != null)
        {
            var bitmap = BitmapFactory.decodeByteArray(detailMemo.thumbnailsrc, 0, detailMemo.thumbnailsrc?.size!!)
-           bitmap = resizeBitmap(480, bitmap)
+           //bitmap = resizeBitmap(480, bitmap)
 
            readDB()
            addImageView()
@@ -227,7 +229,7 @@ class DetailMemoActvity : AppCompatActivity() {
 
             if(Bitmap!= null)
             {
-                Bitmap = resizeBitmap(480, Bitmap) // 이미지 조절 추가
+                //Bitmap = resizeBitmap(480, Bitmap) // 이미지 조절 추가
                 addedImageView.setImageBitmap(Bitmap)
 
                 linear_image_detail.addView(addedImageView)
@@ -371,6 +373,12 @@ class DetailMemoActvity : AppCompatActivity() {
     private fun resizeBitmap(targetWidth: Int, source: Bitmap, isURL:Boolean=false): Bitmap {
         var ratio = source.height.toDouble() / source.width.toDouble()
         var targetHeight = (targetWidth * ratio).toInt()
+
+        if(targetHeight == source.height)
+        {
+            targetHeight/=2
+        }
+
         var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
         if (result != source && !isURL)
         {
@@ -395,7 +403,9 @@ class DetailMemoActvity : AppCompatActivity() {
 
                     val stream = ByteArrayOutputStream()
 
-                    var bitmap = BitmapFactory.decodeFile(source)
+                    var option = BitmapFactory.Options()
+                    option.inSampleSize = 1
+                    var bitmap = BitmapFactory.decodeFile(source, option)
                     bitmap = resizeBitmap(480, bitmap)
                     bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
@@ -436,7 +446,7 @@ class DetailMemoActvity : AppCompatActivity() {
             override fun onLoadFailed(errorDrawable: Drawable?) {
                 super.onLoadFailed(errorDrawable)
 
-                Toast.makeText(applicationContext, "잘못된 URL 입니다.", Toast.LENGTH_LONG).show();
+                Toast.makeText(applicationContext, "잘못된 URL 입니다.", Toast.LENGTH_LONG).show()
             }
 
             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?)
@@ -457,11 +467,8 @@ class DetailMemoActvity : AppCompatActivity() {
     //}}
 
     private fun selectImageView(bitmap: Bitmap) {
-        // 이 때는 썸네일
-        //if (nimage == 0) {
-        //    newImage.setImageBitmap(bitmap)
-        // } else {
-        val addedImageView = ImageView(this)
+
+        var addedImageView = ImageView(this)
         addedImageView.setImageBitmap(bitmap)
 
         linear_image_detail.addView(addedImageView)

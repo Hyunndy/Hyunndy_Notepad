@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity() {
 
         updateItem(null,  deleteTitle, null, UPDATEITEM.DELETE)
     }
-    private fun updateItem(/*memoIdx:Int,*/ iconPath: ByteArray?, title: String, desc: String?, updateCode:UPDATEITEM) {
+    private fun updateItem(iconPath: ByteArray?, title: String, desc: String?, updateCode:UPDATEITEM) {
 
         if(updateCode == UPDATEITEM.DELETE)
         {
@@ -209,9 +209,6 @@ class MainActivity : AppCompatActivity() {
         {
             var item = RecyclerItem()
 
-
-            // **HYEONJIY**
-            //item.setIcon(iconPath)
             item.setThumbnail(iconPath)
             item.setTitle(title)
             item.setDesc(desc)
@@ -220,14 +217,13 @@ class MainActivity : AppCompatActivity() {
             {
                 UPDATEITEM.READ, UPDATEITEM.ADD ->
                 {
-                    // Log.d("test1", "인덱스 시발 관리하기 존나귀찮아 = ${memoIdx}")
+                    Log.d("test300", "미연이미지의 2번째 종착역")
                     mList.add(item)
                 }
                 UPDATEITEM.EDIT ->
                 {
                     mList.clear()
                     readDB()
-                    //mList[memoIdx] = item
                 }
             }
         }
@@ -241,7 +237,6 @@ class MainActivity : AppCompatActivity() {
         var c: Cursor? = memodb?.rawQuery(sql, null)
 
         while (c?.moveToNext()!!) {
-            //var idx_pos = c.getColumnIndex("idx")
             var img_pos = c.getColumnIndex("image")
             var title_pos = c.getColumnIndex("title")
             var desc_pos = c.getColumnIndex("description")
@@ -277,13 +272,14 @@ class MainActivity : AppCompatActivity() {
         var memo = modifiedMemo?.getParcelableExtra<DetailMemoClass>("newMemo")
 
         var contentValues = ContentValues()
-        contentValues.put("image", memo?.thumbnailsrc)
+
         contentValues.put("title", memo?.title)
+        contentValues.put("image", memo?.thumbnailsrc)
         contentValues.put("description", memo?.desc)
 
         memodb?.insert("memolist", null, contentValues)
 
-        var  title = (memo?.title)
+        val title = (memo?.title)!!
 
         var c: Cursor? = memodb?.rawQuery("select * from memolist where title = ?", arrayOf(title))
 
