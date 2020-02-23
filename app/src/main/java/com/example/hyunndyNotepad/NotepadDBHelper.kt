@@ -1,4 +1,4 @@
-package com.example.hyunndy_notepad
+package com.example.hyunndyNotepad
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

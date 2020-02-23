@@ -1,4 +1,4 @@
-package com.example.hyunndy_notepad
+package com.example.hyunndyNotepad
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -21,18 +21,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
-import androidx.core.view.marginTop
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
 import kotlinx.android.synthetic.main.activity_detail_memo_actvity.*
 import kotlinx.android.synthetic.main.content_detail_memo_actvity.*
-import kotlinx.android.synthetic.main.content_new_memo.*
 import java.io.ByteArrayOutputStream
 
 class DetailMemoActvity : AppCompatActivity() {

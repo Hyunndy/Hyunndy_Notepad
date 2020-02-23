@@ -1,4 +1,4 @@
-package com.example.hyunndy_notepad
+package com.example.hyunndyNotepad
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

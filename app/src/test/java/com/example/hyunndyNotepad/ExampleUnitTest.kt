@@ -1,4 +1,4 @@
-package com.example.hyunndy_notepad
+package com.example.hyunndyNotepad
 
 import org.junit.Test
 

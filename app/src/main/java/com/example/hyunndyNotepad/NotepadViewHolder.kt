@@ -1,26 +1,14 @@
-package com.example.hyunndy_notepad
+package com.example.hyunndyNotepad
 
-import android.content.ClipData
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter
-import androidx.recyclerview.widget.RecyclerView.NO_POSITION
-import kotlinx.android.synthetic.*
-import kotlinx.android.synthetic.main.notepad_item.view.*
-import org.w3c.dom.Text
-import com.example.hyunndy_notepad.MemoItem as RecyclerItem
+import com.example.hyunndyNotepad.MemoItem as RecyclerItem
 
 
 public class NotepadAdapter(val itemClick: (RecyclerItem, Int) -> Unit)  : RecyclerView.Adapter<NotepadAdapter.NotePadViewHolder>()

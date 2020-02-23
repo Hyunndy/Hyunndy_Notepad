@@ -1,4 +1,4 @@
-package com.example.hyunndy_notepad
+package com.example.hyunndyNotepad
 
 import android.os.Parcel
 import android.os.Parcelable
