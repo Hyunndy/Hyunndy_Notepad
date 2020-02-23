@@ -3,12 +3,15 @@ package com.example.hyunndy_notepad
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -16,6 +19,7 @@ import android.view.MenuItem
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.io.File
 import com.example.hyunndy_notepad.MemoItem as RecyclerItem
 import com.example.hyunndy_notepad.NotepadAdapter as RecyclerAdapter
 
@@ -31,7 +35,8 @@ enum class REQUESTCODE(val value: Int)
 {
     DETAIL_MEMO(100),
     NEW_MEMO(200),
-    OPEN_GALLERY(300)
+    OPEN_GALLERY(300),
+    OPEN_CAMERA(400)
 }
 
 enum class RESULTCODE(val value: Int)
@@ -44,7 +49,9 @@ class MainActivity : AppCompatActivity() {
 
     //권한
     var permission_list = arrayOf(
-        android.Manifest.permission.READ_EXTERNAL_STORAGE
+        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        android.Manifest.permission.CAMERA
     )
 
     // 어뎁터, 리사이클러뷰에 지정.
@@ -88,6 +95,21 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView?.adapter = mRecyclerAdapter
 
         readDB()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        for(a1 in grantResults)
+        {
+            if(a1 == PackageManager.PERMISSION_DENIED)
+            {
+                return
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
