@@ -11,6 +11,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Path
+import android.graphics.drawable.Drawable
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -27,11 +29,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 
 import kotlinx.android.synthetic.main.activity_new_memo.*
 import kotlinx.android.synthetic.main.content_new_memo.*
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URL
 
 // 뉴 메모.
 class NewMemoActivity : AppCompatActivity() {
@@ -47,15 +53,10 @@ class NewMemoActivity : AppCompatActivity() {
         android.Manifest.permission.CAMERA
     )
 
-
     // **HYEONJIY** DB 추가
     var helper: NotepadDBHelper? = null
     var imagedb: SQLiteDatabase? = null
 
-
-    //**HYEONJIY** 찍은 사진의 외부 저장소 경로 / 사진의 Uri
-    // var dirPath:String? = null
-    // var contentUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +87,8 @@ class NewMemoActivity : AppCompatActivity() {
                             takePicture()
                         }
                         2 -> {
-
+                            Log.d("test3", "여기들어오나?")
+                            getImageFromURL()
                         }
                     }
                 })
@@ -105,17 +107,6 @@ class NewMemoActivity : AppCompatActivity() {
 
             linear_image.addView(addedImageView)
         }
-    }
-
-    // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
-    private fun resizeBitmap(targetWidth: Int, source: Bitmap): Bitmap {
-        var ratio = source.height.toDouble() / source.width.toDouble()
-        var targetHeight = (targetWidth * ratio).toInt()
-        var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
-        if (result != source) {
-            source.recycle()
-        }
-        return result
     }
 
     // **HYEONJIY** 1. db에 테이블 새로 추가해서 2. n개의 이미지 로딩하기. 3. 안되면 이 주석이 달린걸 삭제하세용
@@ -173,53 +164,22 @@ class NewMemoActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_new, menu)
-        return true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        imagedb?.close()
-    }
-
-    // 갤러리에서 사진 가져오기
+    //{{ @HYEONJIY: 4. 이미지 가져오는 부분
+    //---------------------------------------------------------------------------------------------------------------
+    // 1. 갤러리에서 사진 가져오기
     private fun getPicturefromGallery() {
         var intent = Intent(Intent.ACTION_PICK)
         intent.type = android.provider.MediaStore.Images.Media.CONTENT_TYPE
         startActivityForResult(intent, REQUESTCODE.OPEN_GALLERY.value)
     }
 
-    // 사진찍기
+    // 2. 카메라로 사진찍기
     private fun takePicture() {
-        //var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-
-        //var fileName = "temp_NewImage.jpg"
-        //var picPath = dirPath + "${fileName}"
-
-        //// uri객체.
-        //var file = File(picPath)
-
-        //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-        //{
-        //    contentUri = FileProvider.getUriForFile(this, "com.example.hyunndy_notepad.file_provider", file)
-        //}
-        //else
-        //{
-        //    contentUri = Uri.fromFile(file)
-        //}
-
-        //// 카메라로 찍은 사진을 원본 그대로 경로에 저장
-        //intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri)
-        //startActivityForResult(intent, REQUESTCODE.OPEN_CAMERA.value)
-
         var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(intent, REQUESTCODE.OPEN_CAMERA.value)
     }
 
-
+    // 3. 사진 선택 뷰에서 돌아왔을 때.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -262,41 +222,65 @@ class NewMemoActivity : AppCompatActivity() {
             }
         }
     }
-}
+    //---------------------------------------------------------------------------------------------------------------
+    //}}
 
-
-        // 저장된이미지 경로
-        // var bitmap = BitmapFactory.decodeFile(contentUri?.path)
-        // if(bitmap != null)
-        // {
-        //     bitmap = resizeBitmap(480, bitmap)
-        //     bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
-        //     selectImageView(bitmap)
-//
-        //     newImageByteCode.add(nimage, stream.toByteArray())
-        //     nimage++
-        // }
-        /*
-            fun initExternal()
+    //{{ @HYEONJIY 5. 외부 URL 관련은 GLIDE
+    //---------------------------------------------------------------------------------------------------------------
+    private fun getImageFromURL()
     {
-        // 외부저장소 경로
-        var tempPath = Environment.getExternalStorageDirectory().absolutePath
-        dirPath = "${tempPath}/Android./data/${packageName}"
-
-        var file = File(dirPath)
-        if(!file.exists())
+        var imageURL = "https://item.kakaocdn.net/do/605e4a2a6d91f3f30d3fc16010e21dd17154249a3890514a43687a85e6b6cc82"
+        Glide.with(this).asBitmap().load(imageURL).error(R.mipmap.ic_launcher).into( object : CustomTarget<Bitmap>()
         {
-            file.mkdir()
+            override fun onLoadCleared(placeholder: Drawable?)
+            {
+
+            }
+
+            override fun onLoadFailed(errorDrawable: Drawable?) {
+                super.onLoadFailed(errorDrawable)
+                Log.d("test3", "로딩실패??")
+            }
+
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?)
+            {
+                Log.d("test3", "로딩성공")
+                    var stream = ByteArrayOutputStream()
+                    var bitmap = resizeBitmap(480, resource, true)
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+
+                    selectImageView(bitmap)
+
+                    newImageByteCode.add(nimage, stream.toByteArray())
+                    nimage++
+
+            }
+        })
+    }
+    //---------------------------------------------------------------------------------------------------------------
+    //}}
+
+    // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
+    private fun resizeBitmap(targetWidth: Int, source: Bitmap, isURL:Boolean=false): Bitmap {
+        var ratio = source.height.toDouble() / source.width.toDouble()
+        var targetHeight = (targetWidth * ratio).toInt()
+        var result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false)
+        if (result != source && !isURL)
+        {
+            source.recycle()
         }
+        return result
     }
 
-            //**HYEONJIY** 카메라 원본 가져오기
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(permission_list, 0)
-        }
-        else
-        {
-            initExternal()
-        }
-         */
-  */
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_new, menu)
+        return true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        imagedb?.close()
+    }
+}

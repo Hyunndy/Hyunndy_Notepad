@@ -36,13 +36,14 @@ enum class REQUESTCODE(val value: Int)
     DETAIL_MEMO(100),
     NEW_MEMO(200),
     OPEN_GALLERY(300),
-    OPEN_CAMERA(400)
+    OPEN_CAMERA(400),
+    OPEN_URL(500)
 }
 
 enum class RESULTCODE(val value: Int)
 {
     MODIFY_MEMO(10),
-    DELETE_MEMO(20)
+    DELETE_MEMO(20),
 }
 
 class MainActivity : AppCompatActivity() {
@@ -51,7 +52,8 @@ class MainActivity : AppCompatActivity() {
     var permission_list = arrayOf(
         android.Manifest.permission.READ_EXTERNAL_STORAGE,
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        android.Manifest.permission.CAMERA
+        android.Manifest.permission.CAMERA,
+        android.Manifest.permission.INTERNET
     )
 
     // 어뎁터, 리사이클러뷰에 지정.
