@@ -51,9 +51,54 @@
                 android:layout_weight="1"
                 android:ems="100"
                 android:imeOptions="actionDone"
-                android:inputType="textPersonName"
+                android:inputType="textMultiLine"
                 android:scrollHorizontally="false"
                 android:text="내용을 입력해주세요." />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="30dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/addImageBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="50dp"
+                    android:padding="0dp"
+                    android:text="ADD" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="false"
+                    android:layout_alignParentTop="false"
+                    android:layout_alignParentEnd="false"
+                    android:layout_alignParentRight="false"
+                    android:layout_marginStart="175dp"
+                    android:gravity="center"
+                    android:text="이미지"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+                <Button
+                    android:id="@+id/deleteImgBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="50dp"
+                    android:layout_marginBottom="0dp"
+                    android:padding="0dp"
+                    android:text="DELETE" />
+            </RelativeLayout>
 
             <ImageView
                 android:id="@+id/newImage"
@@ -63,10 +108,12 @@
                 android:layout_marginStart="50dp"
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="50dp"
+                android:layout_marginBottom="25dp"
                 android:adjustViewBounds="true"
                 app:srcCompat="@drawable/jellybean" />
 
         </LinearLayout>
+
     </ScrollView>
 
     <EditText
@@ -83,28 +130,6 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/addImageBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="80dp"
-        android:padding="0dp"
-        android:text="ADD"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/deleteImgBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="20dp"
-        android:padding="0dp"
-        android:text="DELETE"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
