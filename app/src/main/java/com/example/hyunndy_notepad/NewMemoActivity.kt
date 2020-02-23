@@ -22,6 +22,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -45,6 +47,7 @@ class NewMemoActivity : AppCompatActivity() {
     private var newImageByteCode = arrayListOf<ByteArray>()
     private var nimage: Int = 0
     private lateinit var imageInflater: LayoutInflater
+    private var imageURL = ""
 
     //권한
     var permission_list = arrayOf(
@@ -87,8 +90,29 @@ class NewMemoActivity : AppCompatActivity() {
                             takePicture()
                         }
                         2 -> {
-                            Log.d("test3", "여기들어오나?")
-                            getImageFromURL()
+                            // 1. 여기서 버튼 클릭 버튼 만들고, 리스너 세팅해서 getImageFromURL()
+                            url_new.visibility =  View.VISIBLE
+                            url_new.setOnEditorActionListener { v, actionId, event ->
+                                if(actionId == EditorInfo.IME_ACTION_DONE)
+                                {
+                                    url_new.visibility = View.GONE
+                                    imageURL = v.text.toString()
+                                    if(imageURL.isEmpty())
+                                    {
+                                        false
+                                    }
+                                    else
+                                    {
+                                        getImageFromURL()
+                                        true
+                                    }
+                                }
+                                else
+                                {
+                                    url_new.visibility = View.GONE
+                                    false
+                                }
+                            }
                         }
                     }
                 })
@@ -229,22 +253,20 @@ class NewMemoActivity : AppCompatActivity() {
     //---------------------------------------------------------------------------------------------------------------
     private fun getImageFromURL()
     {
-        var imageURL = "https://item.kakaocdn.net/do/605e4a2a6d91f3f30d3fc16010e21dd17154249a3890514a43687a85e6b6cc82"
         Glide.with(this).asBitmap().load(imageURL).error(R.mipmap.ic_launcher).into( object : CustomTarget<Bitmap>()
         {
             override fun onLoadCleared(placeholder: Drawable?)
             {
-
             }
 
             override fun onLoadFailed(errorDrawable: Drawable?) {
                 super.onLoadFailed(errorDrawable)
-                Log.d("test3", "로딩실패??")
+
+                Toast.makeText(applicationContext, "잘못된 URL 입니다.", Toast.LENGTH_LONG).show();
             }
 
             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?)
             {
-                Log.d("test3", "로딩성공")
                     var stream = ByteArrayOutputStream()
                     var bitmap = resizeBitmap(480, resource, true)
                     bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)

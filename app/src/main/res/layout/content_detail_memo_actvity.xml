@@ -34,8 +34,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:ems="100"
-                android:inputType="textPersonName"
-                android:text="Name"
+                android:scrollHorizontally="false"
+                android:text="제목두비두밥"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
             <EditText
@@ -46,8 +46,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:ems="100"
-                android:inputType="textPersonName"
-                android:text="Name"
+                android:inputType="textMultiLine"
+                android:scrollHorizontally="false"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:visibility="gone" />
 
@@ -59,8 +59,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:ems="100"
-                android:inputType="textPersonName"
-                android:text="dqwdqd" />
+                android:scrollHorizontally="false"
+                android:text="본문 두비두밥" />
 
             <EditText
                 android:id="@+id/detail_editdesc"
@@ -70,8 +70,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:ems="100"
-                android:inputType="textPersonName"
-                android:text="dqwdqd"
+                android:inputType="textMultiLine"
+                android:scrollHorizontally="false"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:visibility="gone" />
 

@@ -43,7 +43,14 @@ public class MemoItem {
 
     //**HYEONJIY**
     fun getThumbnail() : ByteArray?{
-        return MemoIcon[0]
+        if(MemoIcon.isNullOrEmpty())
+        {
+            return null
+        }
+        else
+        {
+            return MemoIcon[0]
+        }
     }
 
     //**HYEONJIY**
