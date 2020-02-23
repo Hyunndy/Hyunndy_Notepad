@@ -26,10 +26,6 @@ class NotepadDBHelper(context : Context) : SQLiteOpenHelper(context, "Notepad.db
         db?.execSQL(query2)
     }
 
-    override fun onOpen(db: SQLiteDatabase?) {
-        super.onOpen(db)
-    }
-
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

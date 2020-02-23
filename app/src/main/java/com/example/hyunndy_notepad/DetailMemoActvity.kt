@@ -201,19 +201,18 @@ class DetailMemoActvity : AppCompatActivity() {
     }
 
     // **HYEONJIY** DB읽기
-    private fun readDB()
-    {
+    private fun readDB() {
         var title = (detail_title.text.toString())
-        var c: Cursor? = imagedb?.rawQuery("select * from imagelist where title =?", arrayOf(title))
+        var c: Cursor = imagedb?.rawQuery("select * from imagelist where title =?", arrayOf(title))!!
         var imageCount = c?.count
 
-         while(c?.moveToNext()!!)
-         {
-             var imag_pos = c.getColumnIndex("image")
-             var idx_pos = c.getColumnIndex("imageIdx")
+         while(c.moveToNext()) {
 
-             var imageData = c.getBlob(imag_pos)
-             var idxData = c.getInt(idx_pos)
+             val Imagepos = c.getColumnIndex("image")
+             val idxpos = c.getColumnIndex("imageIdx")
+
+             val imageData = c.getBlob(Imagepos)
+             val idxData = c.getInt(idxpos)
 
              newImageByteCode.add(idxData, imageData)
          }
