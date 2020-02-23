@@ -13,16 +13,15 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/add_memo"
+        android:id="@+id/save_memo_detail"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_save"
         android:orderInCategory="200"
         android:title="save_memo"
         android:visible="true"
         app:showAsAction="always" />
-
     <item
-        android:id="@+id/delete_memo"
+        android:id="@+id/delete_memo_detail"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_delete"
         android:orderInCategory="300"

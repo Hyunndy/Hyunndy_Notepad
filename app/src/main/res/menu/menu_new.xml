@@ -4,7 +4,7 @@
     tools:context="com.example.hyunndy_notepad.NewMemoActivity">
 
     <item
-        android:id="@+id/add_memo"
+        android:id="@+id/save_memo_new"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_save"
         android:orderInCategory="200"

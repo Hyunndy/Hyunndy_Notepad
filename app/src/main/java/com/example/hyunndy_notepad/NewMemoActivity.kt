@@ -1,13 +1,16 @@
 package com.example.hyunndy_notepad
 
 import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -16,8 +19,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.getSystemService
-import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_new_memo.*
 import kotlinx.android.synthetic.main.content_new_memo.*
@@ -26,26 +27,27 @@ import java.io.ByteArrayOutputStream
 // 뉴 메모.
 class NewMemoActivity : AppCompatActivity() {
 
-    private lateinit var thumbnail:ImageView
-    private lateinit var newTitle:EditText
-    private lateinit var newDesc:EditText
     private var newImageByteCode = arrayListOf<ByteArray>()
-    private var imageIdx:Int = 0
+    private var nimage:Int = 0
     private lateinit var imageInflater:LayoutInflater
-    private lateinit var imagelinear:LinearLayout
+
+
+    // **HYEONJIY** DB 추가
+    var helper: NotepadDBHelper? = null
+    var imagedb: SQLiteDatabase? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_memo)
         setSupportActionBar(newmemo_toolbar)
 
-        thumbnail = findViewById(R.id.newImage)
-        newTitle = findViewById(R.id.newtitle)
-        newDesc  = findViewById(R.id.newdesc)
-
         imageInflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        imagelinear = findViewById(R.id.linear_image)
-        imageInflater.inflate(R.layout.content_new_memo, imagelinear, false)
+        imageInflater.inflate(R.layout.content_new_memo, linear_image, false)
+
+        // **HYEONJIY** DB 추가
+        helper = NotepadDBHelper(this)
+        imagedb = helper?.writableDatabase
 
         // ~앨범 추가칸~
         addImageBtn.setOnClickListener {
@@ -79,15 +81,15 @@ class NewMemoActivity : AppCompatActivity() {
     private fun selectImageView(bitmap: Bitmap)
     {
         // 이 때는 썸네일
-        if(imageIdx  == 0 ) {
-            thumbnail.setImageBitmap(bitmap)
+        if(nimage  == 0 ) {
+            newImage.setImageBitmap(bitmap)
         }
         else
         {
             val addedImageView = ImageView(this)
             addedImageView.setImageBitmap(bitmap)
 
-            imagelinear.addView(addedImageView)
+            linear_image.addView(addedImageView)
         }
     }
 
@@ -104,7 +106,6 @@ class NewMemoActivity : AppCompatActivity() {
         // 앨범선택칸에서 다시 돌아왔을 때.
         if(requestCode == REQUESTCODE.OPEN_GALLERY.value)
         {
-            // 음??!?!
             if(data == null)
             {
                 return
@@ -120,13 +121,16 @@ class NewMemoActivity : AppCompatActivity() {
             val stream = ByteArrayOutputStream()
 
             bitmap = resizeBitmap(480, bitmap)
+
             selectImageView(bitmap)
+
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
-            newImageByteCode.add(imageIdx, stream.toByteArray())
-            imageIdx++
+            newImageByteCode.add(nimage, stream.toByteArray())
+            nimage++
         }
     }
+
 
     // 이미지가 너무 크면 튕기기때문에 이미지 리사이즈 작업이 필요.
     private fun resizeBitmap(targetWidth : Int, source: Bitmap) : Bitmap
@@ -141,23 +145,28 @@ class NewMemoActivity : AppCompatActivity() {
         return result
     }
 
+    // **HYEONJIY** 1. db에 테이블 새로 추가해서 2. n개의 이미지 로딩하기. 3. 안되면 이 주석이 달린걸 삭제하세용
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.add_memo -> {
+            R.id.save_memo_new -> {
                 if(newtitle.text.isNotEmpty())
                 {
                     var newMemo = DetailMemoClass()
-                    if(imageIdx > 0)
+
+                    newMemo.title = newtitle.text.toString()
+                    newMemo.desc = newdesc.text.toString()
+
+                    if(nimage > 0)
                     {
-                        newMemo.imagesrc = newImageByteCode[0]
+                        newMemo.thumbnailsrc = newImageByteCode[0]
+
+                        // **HYEONJIY**
+                        addImagetoDB(newMemo)
                     }
                     else
                     {
-                        newMemo.imagesrc = null
+                        newMemo.thumbnailsrc = null
                     }
-
-                    newMemo.title = newTitle.text.toString()
-                    newMemo.desc = newTitle.text.toString()
 
                     var intent = Intent()
                     intent.putExtra("newMemo", newMemo)
@@ -174,10 +183,39 @@ class NewMemoActivity : AppCompatActivity() {
         }
     }
 
+    // **HYEONJIY**  마지막에 나갈 때 imagelist DB에 1.메모 타이틀, 2. BLOB, 3. 인덱스를 추가한다.
+    private fun addImagetoDB(newMemo : DetailMemoClass)
+    {
+        var contentValues = ContentValues()
+
+        // 2. 이미지, 인덱스 등록
+        for((idx, image) in newImageByteCode.withIndex())
+        {
+            // 1. title 등록.
+            contentValues.put("title", newMemo.title)
+
+            // 2. 이미지 등록
+            contentValues.put("image", image)
+
+            // 3. 인덱스 등록
+            contentValues.put("imageIdx", idx)
+
+            // 4. db에 넣자! 그리고 이걸 detailmemo에서 꺼내쓰면 된다.
+            imagedb?.insert("imagelist", null, contentValues)
+
+            Log.d("test2", "뉴 메모에서 이미지가 추가됩니다.")
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_new, menu)
         return true
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        imagedb?.close()
+    }
 }

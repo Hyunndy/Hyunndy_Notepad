@@ -53,9 +53,9 @@ public class NotepadAdapter(val itemClick: (RecyclerItem, Int) -> Unit)  : Recyc
 
         fun bind (Items : RecyclerItem)
         {
-            if(Items.getIcon() != null)
+            if(Items.getThumbnail() != null)
             {
-                var array = Items.getIcon()
+                var array = Items.getThumbnail()
                 var Bitmap = BitmapFactory.decodeByteArray(array, 0, array?.size!!)
                 Bitmap = resizeBitmap(480, Bitmap) // 이미지 조절 추가
                 image.setImageBitmap(Bitmap)

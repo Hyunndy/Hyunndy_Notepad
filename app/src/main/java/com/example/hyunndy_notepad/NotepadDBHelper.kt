@@ -12,11 +12,18 @@ class NotepadDBHelper(context : Context) : SQLiteOpenHelper(context, "Notepad.db
 {
     override fun onCreate(db: SQLiteDatabase?) {
         val query = "create table memolist(" +
+                "title text primary key," +
                 "image BLOB," +
-                "title text not null," +
                 "description text" +
                 ");"
         db?.execSQL(query)
+
+        val query2 = "create table imagelist(" +
+                "title text not null," +
+                "image BLOB," +
+                "imageIdx integer" +
+                ");"
+        db?.execSQL(query2)
     }
 
     override fun onOpen(db: SQLiteDatabase?) {

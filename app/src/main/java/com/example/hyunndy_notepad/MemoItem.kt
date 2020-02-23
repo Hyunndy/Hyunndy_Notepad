@@ -1,50 +1,62 @@
 package com.example.hyunndy_notepad
 
 import android.graphics.drawable.Drawable
+import java.util.ArrayList
 
 
 // 아이템 데이터 클래스 정의
 // 1개의 이미지 뷰, 두 개의 텍스트뷰.
 public class MemoItem {
 
-   // private var MemoIdx:Int = 0
-    private var MemoIcon:ByteArray? = null
     private var MemoTitle:String = ""
+    // private var MemoIcon:ByteArray? = NULL
+    private var MemoIcon = arrayListOf<ByteArray>()
     private var MemoDesc:String? = ""
 
-    public fun setIcon(IconPath:ByteArray?)
+    // **HYEONJIY** 썸네일 얻어오기, 아이콘 얻어오기 따로 해야함
+    fun setThumbnail(IconPath:ByteArray?)
     {
-        MemoIcon = IconPath
+        if(IconPath != null)
+        {
+            MemoIcon.add(0, IconPath)
+        }
     }
 
-    public fun setTitle(title:String)
+    // **HYEONHIY** ImageList에 insert해주기 위해 인덱스 마다 image삽입.
+    fun setImageList(images : ArrayList<ByteArray>)
+    {
+        for((idx, image) in images.withIndex())
+        {
+            MemoIcon.add(idx, image)
+        }
+    }
+
+    fun setTitle(title:String)
     {
         MemoTitle = title
     }
 
-    public  fun setDesc(desc:String?)
+    fun setDesc(desc:String?)
     {
         MemoDesc = desc
     }
 
-   //public fun setIdx(Idx: Int)
-   //{
-   //    MemoIdx = Idx
-   //}
+    //**HYEONJIY**
+    fun getThumbnail() : ByteArray?{
+        return MemoIcon[0]
+    }
 
-    public fun getIcon() : ByteArray?{
+    //**HYEONJIY**
+    fun getImageList() : ArrayList<ByteArray>
+    {
         return MemoIcon
     }
 
-    public fun getTitle() : String{
+    fun getTitle() : String{
         return MemoTitle
     }
 
-    public  fun getDesc() : String?{
+    fun getDesc() : String?{
         return MemoDesc
     }
-
-//    public  fun getIdx() : Int{
-//        return MemoIdx
-//    }
 }
