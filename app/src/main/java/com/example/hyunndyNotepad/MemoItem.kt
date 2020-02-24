@@ -2,67 +2,55 @@ package com.example.hyunndyNotepad
 
 import java.util.ArrayList
 
+/* --------------------------------------------------------------------------------------------------
+작성자: HYEONJIYOO
+작성일: 2020.02.24
+클래스명: MemoItem
+클래스기능:
+1. 리스트뷰 하나의 항목을 구성하는 아이템 데이터 정의 클래스.
+2. 리스트뷰 항목 하나에 제목/본문/이미지가 있다.
+-------------------------------------------------------------------------------------------------- */
 
-// 아이템 데이터 클래스 정의
-// 1개의 이미지 뷰, 두 개의 텍스트뷰.
-public class MemoItem {
+class MemoItem {
 
-    private var MemoTitle:String = ""
-    // private var MemoIcon:ByteArray? = NULL
-    private var MemoIcon = arrayListOf<ByteArray>()
-    private var MemoDesc:String? = ""
+    private var memoTitle:String = ""
+    private var memoIcon = arrayListOf<ByteArray>()
+    private var memoDesc:String? = ""
 
-    // **HYEONJIY** 썸네일 얻어오기, 아이콘 얻어오기 따로 해야함
-    fun setThumbnail(IconPath:ByteArray?)
-    {
-        if(IconPath != null)
-        {
-            MemoIcon.add(0, IconPath)
+    fun setThumbnail(IconPath: ByteArray?) {
+        if(IconPath != null) {
+            memoIcon.add(0, IconPath)
         }
     }
 
-    // **HYEONHIY** ImageList에 insert해주기 위해 인덱스 마다 image삽입.
-    fun setImageList(images : ArrayList<ByteArray>)
-    {
-        for((idx, image) in images.withIndex())
-        {
-            MemoIcon.add(idx, image)
+    fun setImageList(images: ArrayList<ByteArray>) {
+        for((idx, image) in images.withIndex()) {
+            memoIcon.add(idx, image)
         }
     }
 
-    fun setTitle(title:String)
-    {
-        MemoTitle = title
+    fun setTitle(title: String) {
+        memoTitle = title
     }
 
-    fun setDesc(desc:String?)
-    {
-        MemoDesc = desc
+    fun setDesc(desc: String?) {
+        memoDesc = desc
     }
 
-    //**HYEONJIY**
-    fun getThumbnail() : ByteArray?{
-        if(MemoIcon.isNullOrEmpty())
-        {
+    fun getThumbnail(): ByteArray? {
+        if(memoIcon.isNullOrEmpty()) {
             return null
         }
-        else
-        {
-            return MemoIcon[0]
+        else {
+            return memoIcon[0]
         }
     }
 
-    //**HYEONJIY**
-    fun getImageList() : ArrayList<ByteArray>
-    {
-        return MemoIcon
+    fun getTitle(): String {
+        return memoTitle
     }
 
-    fun getTitle() : String{
-        return MemoTitle
-    }
-
-    fun getDesc() : String?{
-        return MemoDesc
+    fun getDesc(): String? {
+        return memoDesc
     }
 }
