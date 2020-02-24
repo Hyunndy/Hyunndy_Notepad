@@ -3,9 +3,11 @@ package com.example.hyunndyNotepad
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
+import kotlinx.android.synthetic.main.content_new_memo.*
 import java.io.ByteArrayOutputStream
 
 /* --------------------------------------------------------------------------------------------------
@@ -96,6 +98,4 @@ class MemoHelper {
         }
     }
     //}} @HYEONJIY
-
-
 }

@@ -6,11 +6,13 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -145,8 +147,13 @@ class NewMemoActivity : AppCompatActivity() {
 
     //{{ @HYEONJIY: 메모 작성 후 SAVE 버튼 누르면 후에 메인 Activity에 보내줄 데이터(newMemo)를 세팅한다.
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+
+        when (item.itemId) {
             R.id.save_memo_new -> {
+                if (checkTitleOverlap()) {
+                    Toast.makeText(applicationContext, "<저장불가>제목이 동일한 메모가 있습니다..", Toast.LENGTH_LONG).show()
+                    return false
+                }
                 if (newtitle.text.isNotEmpty()) {
 
                     var newMemo = DetailMemoClass()
@@ -168,12 +175,13 @@ class NewMemoActivity : AppCompatActivity() {
 
                     Toast.makeText(applicationContext, "메모가 저장되었습니다.", Toast.LENGTH_LONG).show()
                 }
-                true
+                return true
             }
             else -> {
                 super.onOptionsItemSelected(item)
             }
         }
+        return false
     }
     //}} @HYEONJIY
 
@@ -263,6 +271,15 @@ class NewMemoActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    //}} @HYEONJIY
+
+    //{{ @HYEONJIY: 현재 imagelist 테이블에서 title이름으로 조회하므로 중복제목을 피하기위해 추가한 함수.
+    private fun checkTitleOverlap() : Boolean {
+        var title = newtitle.text.toString()
+        var c: Cursor? = imagedb?.rawQuery("select * from memolist where title = ?", arrayOf(title))
+
+        return (c?.count!! > 0)
     }
     //}} @HYEONJIY
 

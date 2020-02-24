@@ -291,6 +291,12 @@ class DetailMemoActvity : AppCompatActivity() {
     override fun onBackPressed() {
         // 수정된 경우가 아니면 DB나 MainActivity에 전달할 객체가 없다.
         if(isModified) {
+            if(checkTitleOverlap())
+            {
+                Toast.makeText(applicationContext, "<저장불가>제목이 동일한 메모가 있습니다.", Toast.LENGTH_LONG).show()
+                super.onBackPressed()
+            }
+
             updateImageDB()
 
             var intent = Intent()
@@ -402,6 +408,15 @@ class DetailMemoActvity : AppCompatActivity() {
         addedImageView.setImageBitmap(bitmap)
 
         linear_image_detail.addView(addedImageView)
+    }
+    //}} @HYEONJIY
+
+    //{{ @HYEONJIY: 현재 imagelist 테이블에서 title이름으로 조회하므로 중복제목을 피하기위해 추가한 함수.
+    private fun checkTitleOverlap() : Boolean {
+        var title = detailMemo.title
+        var c: Cursor? = imagedb?.rawQuery("select * from memolist where title = ?", arrayOf(title))
+
+        return (c?.count!! > 0)
     }
     //}} @HYEONJIY
 
